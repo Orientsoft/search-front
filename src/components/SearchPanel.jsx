@@ -4,11 +4,13 @@ import {
     Input,
     Radio,
     Button,
+    Slider,
     DatePicker
 } from 'antd';
 
 const FormItem = Form.Item;
 const { Search } = Input;
+const { RangePicker } = DatePicker;
 
 const formItemLayout = {
     labelCol: {
@@ -19,11 +21,24 @@ const formItemLayout = {
     }
 };
 
+const marks = {
+    0: '0',
+    26: '10',
+    37: '12',
+    100: {
+        style: {
+            color: '#f50',
+        },
+        label: <strong>24</strong>,
+    }
+};
+
 export default class SearchPanel extends React.Component {
 
   render() {
     return (
       <div>
+        <Slider marks={marks} step={1} defaultValue={12} />
         <Form>
           <FormItem {...formItemLayout} label="快速选择">
             <Radio>1小时</Radio>
@@ -32,7 +47,7 @@ export default class SearchPanel extends React.Component {
             <Radio>一周</Radio>
           </FormItem>
           <FormItem {...formItemLayout} label="自定义时间">
-            <DatePicker />
+            <RangePicker />
           </FormItem>
           <FormItem {...formItemLayout} label="过滤字段">
             <Radio>交易码</Radio>
@@ -44,7 +59,7 @@ export default class SearchPanel extends React.Component {
             <Search placeholder="Search..." enterButton />
           </FormItem>
           <FormItem {...formItemLayout} label="查询条件">
-            <Button>保存查询条件</Button>
+            <Button type="primary">保存查询条件</Button>
           </FormItem>
         </Form>
       </div>
