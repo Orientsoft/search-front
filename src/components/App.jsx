@@ -1,6 +1,7 @@
 import React from 'react';
 import { Layout } from 'antd';
 import Workspace from './Workspace';
+import LeftSidebar from './LeftSidebar';
 
 /**
  * 整体布局
@@ -8,7 +9,7 @@ import Workspace from './Workspace';
  */
 export default () => (
     <Layout>
-        <Layout.Sider>Sider</Layout.Sider>
+        <LeftSidebar />
         <Layout>
             <Workspace />
         </Layout>
