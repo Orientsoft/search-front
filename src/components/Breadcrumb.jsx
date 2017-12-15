@@ -1,6 +1,6 @@
 import React from 'react';
 import { Breadcrumb as AntBreadcrumb } from 'antd';
-import styles from '../less/workspace.less';
+import styles from '../less/styles.less';
 
 const Item = AntBreadcrumb.Item;
 
