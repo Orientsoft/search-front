@@ -2,8 +2,8 @@
 
 const paths = require('./paths');
 
-const host = '192.168.0.48';
-const port = '1250';
+const host = '127.0.0.1';
+const port = '3000';
 
 const apiProxy = "http://192.168.0.48:5000";
 
