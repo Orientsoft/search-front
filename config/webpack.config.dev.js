@@ -109,7 +109,7 @@ module.exports = {
                                 "transform-class-properties",
                                 "react-hot-loader/babel",
                                 ["lodash", { "id": ["lodash", "semantic-ui-react"] }],
-                                ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }]
+                                ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": false }]
                             ]
                         },
                     },
@@ -121,9 +121,9 @@ module.exports = {
                             {
                                 loader: require.resolve('css-loader'),
                                 options: {
-                                    modules: true,
+                                    // modules: true,
                                     // localIdentName: '__[hash:base64:10]__',
-                                    importLoaders: 1,
+                                    // importLoaders: 1,
                                 },
                             },
                             {

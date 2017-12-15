@@ -1,6 +1,5 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
-import styles from '../less/styles.less';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -10,12 +9,12 @@ class LeftSidebar extends React.Component {
     render() {
         return (
             <Sider style={{ overflow: 'auto', minHeight: '100vh' }}>
-                <div className={styles.logo}>
+                <div className="logo">
                     <span>大数据智能运维平台</span>
                 </div>
                 <Menu mode="inline" theme="dark">
                     <SubMenu key="top" title="Analyze">
-                        <p className={styles.searchManage}>查询</p>
+                        <p className="searchManage">查询</p>
                         <SubMenu key="sub1" title={<span>联合查询</span>}>
                             <Menu.Item key="1">核心</Menu.Item>
                             <Menu.Item key="2">手机</Menu.Item>
@@ -26,7 +25,7 @@ class LeftSidebar extends React.Component {
                         </SubMenu>
                         <Menu.Item key="7">单数据源查询</Menu.Item>
                         <Menu.Item key="8">历史查询记录</Menu.Item>
-                        <p className={styles.searchManage}>管理</p>
+                        <p className="searchManage">管理</p>
                         <Menu.Item key="9">查询管理</Menu.Item>
                     </SubMenu>
                 </Menu>

@@ -20,6 +20,6 @@
         "transform-class-properties",
         "react-hot-loader/babel",
         ["lodash", { "id": ["lodash"] }],
-        ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": true }]
+        ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": false }]
     ]
 }

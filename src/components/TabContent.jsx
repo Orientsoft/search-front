@@ -2,7 +2,6 @@ import React from 'react';
 import { Tabs, Table, Button, Modal, Card } from 'antd';
 import { observer } from 'mobx-react';
 import G2 from '@antv/g2';
-import styles from '../less/styles.less'
 
 const TabPane = Tabs.TabPane;
 const pagination = {
@@ -138,7 +137,7 @@ const chartData = [{
 			title: '数据',
 			dataIndex: 'data',
             key: 'data', 
-            render: (text)=> <span className={styles.dataDetail}>{text}</span>
+            render: (text)=> <span className="dataDetail">{text}</span>
 		}, {
 			title: '详情',
 			dataIndex: 'id',
@@ -146,7 +145,7 @@ const chartData = [{
 			render: (text) => <Button type="primary" detail_id={text} onClick={this.showModal}>详情</Button>
 		}]
 		return(
-			<div className={styles.tabContent}>
+			<div className="tabContent">
 			<Card>
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="详情" key="1">
@@ -162,17 +161,17 @@ const chartData = [{
                     footer={null}
                     onCancel={this.hideModal}
                     >
-                    <div className={styles.tabLine}>
+                    <div className="tabLine">
                         <p>时间</p>
                         <p>{this.state.showModalData.time}</p>
                     </div>
-                    <div className={styles.tabLine}>
+                    <div className="tabLine">
                         <p>类型</p>
                         <p>{this.state.showModalData.type}</p>
                     </div>
-                    <div className={styles.tabLineLast}>
+                    <div className="tabLineLast">
                         <p>数据</p>
-                        <p className={styles.modalData}>{this.state.showModalData.data}</p>
+                        <p className="modalData">{this.state.showModalData.data}</p>
                     </div>
                 </Modal>
             </Card>

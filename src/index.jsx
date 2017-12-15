@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import App from './components/App';
 import stores from './stores';
+import './less/styles.less';
 
 // wrap App in AppContainer to support react hot loader
 const render = () => {
