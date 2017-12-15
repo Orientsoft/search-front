@@ -9,7 +9,7 @@ class LeftSidebar extends React.Component {
 
     render() {
         return (
-            <Sider style={{ overflow: 'auto', height: '100vh' }}>
+            <Sider style={{ overflow: 'auto', minHeight: '100vh' }}>
                 <div className={styles.logo}>
                     <span>大数据智能运维平台</span>
                 </div>

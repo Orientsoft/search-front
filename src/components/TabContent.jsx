@@ -1,10 +1,9 @@
-import React, {
-	Component
-} from 'react';
-import { Tabs, Table, Button, Modal } from 'antd';
+import React from 'react';
+import { Tabs, Table, Button, Modal, Card } from 'antd';
 import { observer } from 'mobx-react';
 import G2 from '@antv/g2';
-import style from '../less/styles.less'
+import styles from '../less/styles.less'
+
 const TabPane = Tabs.TabPane;
 const pagination = {
 	defaultPageSize: 5
@@ -112,8 +111,7 @@ const chartData = [{
 
 ]
 
-@observer
-class TabContent extends Component {
+@observer class TabContent extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
@@ -140,7 +138,7 @@ class TabContent extends Component {
 			title: '数据',
 			dataIndex: 'data',
             key: 'data', 
-            render: (text)=> <span className={style.dataDetail}>{text}</span>
+            render: (text)=> <span className={styles.dataDetail}>{text}</span>
 		}, {
 			title: '详情',
 			dataIndex: 'id',
@@ -148,7 +146,8 @@ class TabContent extends Component {
 			render: (text) => <Button type="primary" detail_id={text} onClick={this.showModal}>详情</Button>
 		}]
 		return(
-			<div className={style.tabContent}>
+			<div className={styles.tabContent}>
+			<Card>
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="详情" key="1">
                         {this.state.result.length > 0 && <Table columns={columns} dataSource={this.state.result} pagination={pagination} ></Table>}
@@ -163,20 +162,21 @@ class TabContent extends Component {
                     footer={null}
                     onCancel={this.hideModal}
                     >
-                    <div className={style.tabLine}>
+                    <div className={styles.tabLine}>
                         <p>时间</p>
                         <p>{this.state.showModalData.time}</p>
                     </div>
-                    <div className={style.tabLine}>
+                    <div className={styles.tabLine}>
                         <p>类型</p>
                         <p>{this.state.showModalData.type}</p>
                     </div>
-                    <div className={style.tabLineLast}>
+                    <div className={styles.tabLineLast}>
                         <p>数据</p>
-                        <p className={style.modalData}>{this.state.showModalData.data}</p>
+                        <p className={styles.modalData}>{this.state.showModalData.data}</p>
                     </div>
                 </Modal>
-            </div>
+            </Card>
+			</div>
 		);
 	}
 
@@ -184,7 +184,7 @@ class TabContent extends Component {
 		if(!this.chart) {
 			this.chart = new G2.Chart({
 				container: el, // 指定图表容器 ID
-				width: 600, // 指定图表宽度
+				forceFit: true,
 				height: 300 // 指定图表高度
 			});
 		}

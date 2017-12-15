@@ -2,7 +2,7 @@ import React from 'react';
 import { Breadcrumb as AntBreadcrumb } from 'antd';
 import styles from '../less/styles.less';
 
-const Item = AntBreadcrumb.Item;
+const { Item } = AntBreadcrumb;
 
 export default class Breadcrumb extends React.Component {
 
