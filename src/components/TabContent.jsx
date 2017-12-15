@@ -4,7 +4,7 @@ import React, {
 import { Tabs, Table, Button, Modal } from 'antd';
 import { observer } from 'mobx-react';
 import G2 from '@antv/g2';
-import style from '../less/style.less'
+import style from '../less/styles.less'
 const TabPane = Tabs.TabPane;
 const pagination = {
 	defaultPageSize: 5

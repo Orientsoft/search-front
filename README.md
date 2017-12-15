@@ -11,7 +11,7 @@ yarn install
 ```
 yarn dev
 ```
-webpack dev server will be run on port 1250, with react hot reloader enabled  
+webpack dev server will run on port 1250, with react hot reloader enabled  
 
 3. Build release  
 ```
