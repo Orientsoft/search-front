@@ -4,13 +4,13 @@
 #components 文件夹下
 
 App   -  整体框架
-   |
+
    |
    ----LeftSidebar   左侧
-   |
+
    |
    ----SearchContent   右侧
-     |
+
      |
      ----TBreadcrumb   右侧面包屑
      |
