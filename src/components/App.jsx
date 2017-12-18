@@ -2,6 +2,7 @@ import React from 'react';
 import { Layout } from 'antd';
 import Workspace from './Workspace';
 import LeftSidebar from './LeftSidebar';
+import ShowIndex from './ShowIndex';
 
 /**
  * 整体布局
