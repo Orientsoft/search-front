@@ -82,36 +82,7 @@ module.exports = {
                     {
                         test: /\.(js|jsx)$/,
                         include: paths.appSrc,
-                        loader: require.resolve('babel-loader'),
-                        options: {
-                            // This is a feature of `babel-loader` for webpack (not Babel itself).
-                            // It enables caching results in ./node_modules/.cache/babel-loader/
-                            // directory for faster rebuilds.
-                            cacheDirectory: true,
-                            presets: [
-                                [
-                                    "env", 
-                                    {
-                                        "modules": false,
-                                        "targets": {
-                                            "browsers": [
-                                                "last 2 versions"
-                                            ]
-                                        }
-                                    }
-                                ], 
-                                "react",
-                                "stage-1"
-                            ],
-                            plugins: [
-                                "transform-decorators-legacy",
-                                "transform-runtime",
-                                "transform-class-properties",
-                                "react-hot-loader/babel",
-                                ["lodash", { "id": ["lodash", "semantic-ui-react"] }],
-                                ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": false }]
-                            ]
-                        },
+                        loader: require.resolve('babel-loader')
                     },
                     // LESS
                     {
