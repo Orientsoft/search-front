@@ -126,7 +126,7 @@ const chartData = [
 			dataIndex: 'data',
 			key: 'data',
 			width: '60%',
-			render: (text) => <Collapse defaultActiveKey={['1']}><Panel header="点击查看数据" >{text}</Panel></Collapse>
+			render: (text) => <p className="wordBreak">{text}</p>
 		}, {
 			title: '详情',
 			dataIndex: 'id',
@@ -162,7 +162,7 @@ const chartData = [
 						</div>
 						<div className="tabLineLast">
 							<p>数据</p>
-							<p className="modalData">{this.state.showModalData.data}</p>
+							<p className="wordBreak">{this.state.showModalData.data}</p>
 						</div>
 					</Modal>
 				</Card>
