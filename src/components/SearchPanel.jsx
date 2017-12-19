@@ -7,6 +7,7 @@ import {
     Slider,
     DatePicker
 } from 'antd';
+import Component from './Component';
 
 const FormItem = Form.Item;
 const { Search } = Input;
@@ -33,7 +34,7 @@ const marks = {
     }
 };
 
-export default class SearchPanel extends React.Component {
+export default class SearchPanel extends Component {
 
   render() {
     return (

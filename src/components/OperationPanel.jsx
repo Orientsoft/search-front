@@ -2,11 +2,12 @@ import React from 'react';
 import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
 import { Tabs, Card } from 'antd';
+import Component from './Component';
 import SearchPanel from './SearchPanel';
 
 const TabPane = Tabs.TabPane;
 
-@observer class OperationPanel extends React.Component {
+@observer class OperationPanel extends Component {
 
   @action.bound onTabChange(key) {
 

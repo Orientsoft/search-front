@@ -9,26 +9,26 @@ import get from 'lodash/get';
  */
 class Component extends React.Component {
 
-	static contextTypes = {
-		store: PropTypes.object.isRequired,
-		elastic: PropTypes.object.isRequired
-	};
-
-	/**
-	 * 对this.props.store.appStore的简写，用于获取store中appStore
-	 * 使用方法：this.app
-	 */
-	get app() {
-		return this.context.store.appStore;
-	}
+    static contextTypes = {
+        store: PropTypes.object.isRequired,
+        elastic: PropTypes.object.isRequired
+    };
 
 	/**
 	 * 对this.props.store的简写
 	 * 使用方法：this.store
 	 */
-	get store() {
-		return this.context.store;
-	}
+    get store() {
+        return this.context.store;
+    }
+
+	/**
+	 * 对this.props.store.appStore的简写，用于获取store中appStore
+	 * 使用方法：this.appStore
+	 */
+    get appStore() {
+        return this.context.store.appStore;
+    }
 
 	/**
 	 * 对this.props.store.appStore.es的简写，因为Elasticsearch并不是一个store
@@ -36,25 +36,25 @@ class Component extends React.Component {
 	 * 而不是elasticsearch.Client的实例
 	 * 使用方法：this.elastic
 	*/
-	get elastic() {
-		return this.context.elastic;
-	}
+    get elastic() {
+        return this.context.elastic;
+    }
 
 	/**
 	 * 获取结果中的hits数据
 	 * 没有数据则返回空数组
 	 */
-	getHits() {
-		return get(this.app.queryResult, 'hits.hits', []);
-	}
+    getHits() {
+        return get(this.app.queryResult, 'hits.hits', []);
+    }
 
 	/**
 	 * 获取结果中的buckets数据
 	 * 没有数据则返回空数组
 	 */
-	getBuckets(agg) {
-		return get(this.app.queryResult, `aggregations.${agg}.buckets`, []);
-	}
+    getBuckets(agg) {
+        return get(this.app.queryResult, `aggregations.${agg}.buckets`, []);
+    }
 }
 
 export default Component;

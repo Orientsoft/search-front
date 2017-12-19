@@ -1,10 +1,11 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
+import Component from './Component';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-class LeftSidebar extends React.Component {
+class LeftSidebar extends Component {
 
     render() {
         return (

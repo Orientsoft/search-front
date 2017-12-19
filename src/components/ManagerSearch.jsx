@@ -3,11 +3,12 @@ import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
 import cloneDeep from 'lodash/cloneDeep';
 import {Row, Col,Input,Button,Icon,Select,Card } from 'antd';
+import Component from './Component';
 
 const Option = Select.Option;
 
 
-@observer class ManagerSearch extends React.Component {
+@observer class ManagerSearch extends Component {
     constructor(props, context) {
         super(props, context);
         this.store = this.props.store.appStore;

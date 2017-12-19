@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { Card, Table } from 'antd'
-
+import React from 'react';
+import { Card, Table } from 'antd';
+import Component from './Component';
 
 const pagination = {
 	defaultPageSize: 5

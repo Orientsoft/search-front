@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 import isEqual from 'lodash/isEqual';
+import Component from './Component';
 
 class Chart extends Component {
     constructor(props, context) {

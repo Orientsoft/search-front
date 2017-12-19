@@ -12,7 +12,7 @@ const render = () => {
         <AppContainer>
             <App store={stores} elastic={elastic} />
         </AppContainer>,
-        document.getElementById('mobx_container')
+        document.getElementById('root')
     );
 };
 
