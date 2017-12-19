@@ -7,6 +7,7 @@ import {
     Slider,
     DatePicker
 } from 'antd';
+import { action } from 'mobx';
 import Component from './Component';
 
 const FormItem = Form.Item;
@@ -94,7 +95,6 @@ export default class SearchPanel extends Component {
 
   onSearch(value) {
     const fieldValue = value;
-    console.log(this.data, fieldValue)
     const { datetime, field } = this.data;
 
     this.elastic.search({
@@ -104,7 +104,8 @@ export default class SearchPanel extends Component {
           [field]: {
             date_histogram: {
               field: '@TranTime',
-              interval: 'month'
+              interval: 'day',
+              format: "yyyy-MM-dd"
             }
           }
         },
@@ -127,6 +128,6 @@ export default class SearchPanel extends Component {
           }
         }
       }
-    });
+    }).then(() => this.appStore.currentAggs.push(field));
   }
 }

@@ -41,7 +41,7 @@ class Chart extends Component {
 		// Step 2: 载入数据源
 		if (data.length > 0) {
 			chart.source(data, {
-				key: {
+				key_as_string: {
 					alias: '时间（单位/小时）',
                     range: [0, 1], 
 				},
@@ -54,7 +54,7 @@ class Chart extends Component {
 					type: 'line'
 				}
             });
-            chart.axis('key', {
+            chart.axis('key_as_string', {
                 title: {
                     
                 }
@@ -62,7 +62,7 @@ class Chart extends Component {
             chart.axis('doc_count', {
                 title: {}
             })
-			chart.line().position('key*doc_count').size(2);
+			chart.line().position('key_as_string*doc_count').size(2);
 			chart.render();
 		}
 
