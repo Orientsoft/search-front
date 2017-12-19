@@ -3,7 +3,7 @@ import store from '../stores';
 
 // Elasticsearch客户端实例
 export const client = new elasticsearch.Client({
-    host: process.env.SEARCH_FRONT_ES_ENDPOINT
+    host: '192.168.0.21:9400'
 });
 
 function throwQueryError(tip) {
@@ -71,12 +71,26 @@ export default {
             body: data
         }).catch(throwQueryError('saveSingleDataSource()'));
     },
+    getSingleDataSource: (name) => {
+        let query = {
+            index: 'query',
+            type: 'single'
+        };
+        
+        if (name) {
+            query = Object.assign(query, {
+                id: Buffer.from(name).toString('base64')
+            });
+        }
+        
+        return client.search(query).catch(throwQueryError('search()'));
+    },
     /**
      * 删除单数据源
      * @param {String} name - 数据源名称
      * @return {Promise}
      */
-    deleleSingleDataSource: (name) => {
+    deleteSingleDataSource: (name) => {
         return client.delete({
             index: 'query',
             type: 'single',
@@ -102,7 +116,7 @@ export default {
      * @param {String} name - 数据源名称
      * @return {Promise}
      */
-    deleleMultipleDataSource: (name) => {
+    deleteMultipleDataSource: (name) => {
         return client.delete({
             index: 'query',
             type: 'multiple',
