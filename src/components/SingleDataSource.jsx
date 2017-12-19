@@ -6,7 +6,6 @@ import get from 'lodash/get';
 import { Row, Col, Input, Button, Icon, Select, Card } from 'antd';
 import Component from './Component';
 import DataSourceItem from './DataSourceItem';
-import { disable } from '.7.3.1@promise/lib/rejection-tracking';
 
 const Option = Select.Option;
 
