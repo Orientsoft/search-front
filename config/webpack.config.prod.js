@@ -117,33 +117,7 @@ let config = {
                 {
                     test: /\.(js|jsx)$/,
                     include: paths.appSrc,
-                    loader: require.resolve('babel-loader'),
-                    options: {
-                        compact: true,
-                        presets: [
-                            [
-                                "env", 
-                                {
-                                    "modules": false,
-                                    "targets": {
-                                        "browsers": [
-                                            "last 2 versions"
-                                        ]
-                                    }
-                                }
-                            ], 
-                            "react",
-                            "stage-1"
-                        ],
-                        plugins: [
-                            "transform-decorators-legacy",
-                            "transform-runtime",
-                            "transform-class-properties",
-                            "react-hot-loader/babel",
-                            ["lodash", { "id": ["lodash", "semantic-ui-react"] }],
-                            ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }]
-                        ]
-                    },
+                    loader: require.resolve('babel-loader')
                 },
                 // LESS
                 {

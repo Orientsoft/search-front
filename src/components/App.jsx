@@ -1,18 +1,34 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Layout } from 'antd';
 import Workspace from './Workspace';
 import LeftSidebar from './LeftSidebar';
-import ShowIndex from './ShowIndex';
 
 /**
  * 整体布局
  * 左侧菜单栏，右侧工作区
  */
-export default () => (
-    <Layout>
-        <LeftSidebar />
-        <Layout>
-            <Workspace />
-        </Layout>
-    </Layout>
-);
+class App extends React.Component {
+
+    static childContextTypes = {
+        store: PropTypes.object.isRequired,
+        elastic: PropTypes.object.isRequired
+    };
+
+    getChildContext() {
+        return this.props
+    }
+
+    render() {
+        return (
+            <Layout>
+                <LeftSidebar />
+                <Layout>
+                    <Workspace />
+                </Layout>
+            </Layout>
+        );
+    }
+};
+
+export default App;

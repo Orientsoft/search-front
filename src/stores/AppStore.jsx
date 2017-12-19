@@ -1,36 +1,14 @@
-import {observable, computed} from 'mobx';
-import search from '../services/es';
+import { observable, extendObservable } from 'mobx';
 
-class AppStore {
-    @observable state = {
-        queryResult: null,
-        queryString: null
-    }
-
-    constructor() {
-        this.query = this.query.bind(this);
-    }
-
-    updateQueryString(queryString) {
-        this.state.queryString = queryString;
-        console.log(this.state.queryString);
-    }
-
-    query() {
-        // query from es
-        search(this.state.queryString).then((results) => {
-            this.state.queryResult = results;
-        }).catch((err) => {
-            this.state.queryResult = err.message;
-        });
-    }
-
-    @computed get resultString() {
-        if (this.state.queryResult == null)
-            return 'N/A';
-
-        return JSON.stringify(this.state.queryResult);
+/**
+ * 应用级Store
+ * 保存全局数据、状态及方法
+ */
+export default class AppStore {
+    constructor(others) {
+        extendObservable(this, Object.assign({
+            queryResult: observable.ref({}),
+            queryError: observable.ref(null)
+        }, others));
     }
 }
-
-export default AppStore;

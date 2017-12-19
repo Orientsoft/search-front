@@ -1,15 +1,14 @@
 {
-    "env": {
-        "browser": true,
-        "commonjs": true,
-        "es6": true
-    },
     "extends": "airbnb",
+    "env": {
+        "es6": true,
+        "browser": true,
+        "commonjs": true
+    },
     "rules": {
         "max-len": ["error", 120],
-        "indent": ["error", 4, {
-        "SwitchCase": 1
-        }],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "no-console": "off",
         "linebreak-style": "off",
         "no-useless-escape": "off",
         "no-plusplus": "off",
@@ -17,27 +16,21 @@
         "comma-dangle": "off",
         "arrow-body-style": "off",
         "no-trailing-spaces": ["error", {
-        "skipBlankLines": true,
-        "ignoreComments": true
+            "skipBlankLines": true,
+            "ignoreComments": true
         }],
         "no-empty": ["error", { "allowEmptyCatch": true }],
         "function-paren-newline": "off",
         "object-curly-newline": ["error", {
-        "multiline": true,
-        "consistent": true
+            "multiline": true,
+            "consistent": true
         }],
         "global-require": "off",
-        "import/no-extraneous-dependencies": ["error", {"devDependencies": ["gulpfile.js", "gulp/*", "config/*"]}],
-
+        "import/no-extraneous-dependencies": ["error", { "devDependencies": ["gulpfile.js", "gulp/*", "config/*"] }],
         "react/forbid-prop-types": "off",
         "react/jsx-indent-props": ["error", 4],
         "react/jsx-indent": ["error", 4],
         "react/jsx-closing-bracket-location": ["error", "after-props"],
-        "react/prefer-stateless-function": ["error", { "ignorePureComponents": true }],
-
-        "jsx-a11y/label-has-for": "off",
-        "jsx-a11y/anchor-is-valid": ["error", {
-        "components": []
-        }]
+        "react/prefer-stateless-function": ["error", { "ignorePureComponents": true }]
     }
 }

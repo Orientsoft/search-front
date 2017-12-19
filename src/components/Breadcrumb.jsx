@@ -1,9 +1,10 @@
 import React from 'react';
 import { Breadcrumb as AntBreadcrumb } from 'antd';
+import Component from './Component';
 
 const { Item } = AntBreadcrumb;
 
-export default class Breadcrumb extends React.Component {
+export default class Breadcrumb extends Component {
 
   render() {
     return (

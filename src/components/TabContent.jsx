@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs, Table, Button, Modal, Card, Collapse } from 'antd';
 import { observer } from 'mobx-react';
 import G2 from '@antv/g2';
+import Component from './Component';
 import Chart from './Chart';
 
 const Panel = Collapse.Panel;
@@ -96,7 +97,7 @@ const chartData = [
 	{ title: '核心', data: [{ "key": "0点", "doc_count": 378 }, { "key": '1点', "doc_count": 302 }, { "key": "2点", "doc_count": 136 }, { "key": "3点", "doc_count": 128 }, { "key": "4点", "doc_count": 532 }] },
 ]
 
-@observer class TabContent extends React.Component {
+@observer class TabContent extends Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
