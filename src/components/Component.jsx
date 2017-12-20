@@ -45,7 +45,7 @@ class Component extends React.Component {
 	 * 没有数据则返回空数组
 	 */
     getHits() {
-        return get(this.app.queryResult, 'hits.hits', []);
+        return get(this.appStore.queryResult, 'hits.hits', []);
     }
 
 	/**
@@ -53,7 +53,7 @@ class Component extends React.Component {
 	 * 没有数据则返回空数组
 	 */
     getBuckets(agg) {
-        return get(this.app.queryResult, `aggregations.${agg}.buckets`, []);
+        return get(this.appStore.queryResult, `aggregations.${agg}.buckets`, []);
     }
 }
 

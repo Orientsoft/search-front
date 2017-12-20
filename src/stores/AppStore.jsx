@@ -10,6 +10,7 @@ export default class AppStore {
             queryResult: observable.ref({}),
             queryError: observable.ref(null),
             singleDataNames:[]
+            currentAggs: []
         }, others));
     }
 }
