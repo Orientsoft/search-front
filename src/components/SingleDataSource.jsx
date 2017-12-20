@@ -6,28 +6,27 @@ import get from 'lodash/get';
 import { Row, Col, Input, Button, Icon, Select, Card } from 'antd';
 import Component from './Component';
 import DataSourceItem from './DataSourceItem';
-import { disable } from '.7.3.1@promise/lib/rejection-tracking';
 
 const Option = Select.Option;
 
 @observer class SingleDataSource extends Component {
 
-    @observable dataSource = []
-    @observable enableEdit = []
+    // @observable dataSource = []
+    // @observable enableEdit = []
 
-    componentWillMount() {
-        this.elastic.getSingleDataSource().then(result => {
-            this.dataSource = get(result, 'hits.hits', []).map(data => data._source);
-            this.enableEdit = Array(this.dataSource.length);
-        });
-    }
+    // componentWillMount() {
+    //     this.elastic.getSingleDataSource().then(result => {
+    //         this.dataSource = get(result, 'hits.hits', []).map(data => data._source);
+    //         this.enableEdit = Array(this.dataSource.length);
+    //     });
+    // }
 
     render() {
         return (
             <Card>
                 <p className='headerManager'>定义单数据源：</p>
                 <Button type="primary" icon="plus">添加数据</Button>
-                <div className='contentManager'>
+                {/* <div className='contentManager'>
                     <Row gutter={16}>
                         <Col span={3} className="gutter-row">类型:</Col>
                         <Col span={3} className="gutter-row">数据源:</Col>
@@ -35,8 +34,10 @@ const Option = Select.Option;
                         <Col span={5} className="gutter-row">名称:</Col>
                     </Row>
                     <DataSourceItem onSave={this.onItemSave} />
-                </div>
-                <div className='contentManager'>
+                </div> */}
+                {/* <DataSourceItem onSave={this.onItemSave} /> */}
+                <DataSourceItem  />
+                {/* <div className='contentManager'>
                     {this.dataSource.map((item, key) => {
                         return (<Row gutter={16} key={key}>
                             <Col span={3} className="gutter-row">
@@ -75,25 +76,25 @@ const Option = Select.Option;
                             </Col>
                         </Row>)
                     })}
-                </div>
+                </div> */}
             </Card>
         );
     }
 
-    @action.bound onItemSave(data) {
-        this.dataSource.push(data);
-        this.enableEdit.push(false);
-    }
+    // @action.bound onItemSave(data) {
+    //     this.dataSource.push(data);
+    //     this.enableEdit.push(false);
+    // }
 
-    @action onDeleteSource(key) {
-        const source = this.dataSource.splice(key, 1)[0];
-        this.enableEdit[key] = false;
-        this.elastic.deleteSingleDataSource(source.name);
-    }
+    // @action onDeleteSource(key) {
+    //     const source = this.dataSource.splice(key, 1)[0];
+    //     this.enableEdit[key] = false;
+    //     this.elastic.deleteSingleDataSource(source.name);
+    // }
 
-    @action onEditSource(key) {
-        this.enableEdit[key] = true;
-    }
+    // @action onEditSource(key) {
+    //     this.enableEdit[key] = true;
+    // }
 }
 
 export default SingleDataSource;

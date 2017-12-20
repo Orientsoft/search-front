@@ -3,7 +3,7 @@ import store from '../stores';
 
 // Elasticsearch客户端实例
 export const client = new elasticsearch.Client({
-    host: '192.168.0.21:9400'
+    host: '192.168.0.21:9900'
 });
 
 function throwQueryError(tip) {
@@ -76,13 +76,13 @@ export default {
             index: 'query',
             type: 'single'
         };
-        
+
         if (name) {
             query = Object.assign(query, {
                 id: Buffer.from(name).toString('base64')
             });
         }
-        
+
         return client.search(query).catch(throwQueryError('search()'));
     },
     /**
@@ -122,5 +122,44 @@ export default {
             type: 'multiple',
             id: Buffer.from(name).toString('base64')
         }).catch(throwQueryError('deleteMultipleDataSource()'));
+    },
+    /**获取多数据源数据 */
+    getMultipleDataSource: (name) => {
+        let query = {
+            index: 'query',
+            type: 'multiple'
+        };
+
+        if (name) {
+            query = Object.assign(query, {
+                id: Buffer.from(name).toString('base64')
+            });
+        }
+
+        return client.search(query).catch(throwQueryError('search()'));
+    },
+
+    //修改单数据源
+    updateSingleDataSource: (name, data) => {
+        return client.update({
+            index: 'query',
+            type: 'single',
+            id: Buffer.from(name).toString('base64'),
+            body: {
+                doc:data
+            }
+        }).catch(throwQueryError('updateSingleDataSource()'));
+    },
+    //修改多数据源
+    updateMultipleDataSource: (name, data) => {
+        return client.update({
+            index: 'query',
+            type: 'multiple',
+            id: Buffer.from(name).toString('base64'),
+            body: {
+                doc:data
+            }
+        }).catch(throwQueryError('updateMultipleDataSource()'));
     }
+
 };
