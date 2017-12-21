@@ -43,7 +43,7 @@ const result = [{
 	type: 'D',
 	data: detailString
 }]
-class ShowIndex extends Component {
+class Index extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
@@ -76,6 +76,7 @@ class ShowIndex extends Component {
         return (
             <div>
                 <Card>
+                    首页
                     {this.state.result.length > 0 && <Table columns={columns} dataSource={thi.state.result}></Table>}
                 </Card>
             </div>
@@ -83,4 +84,4 @@ class ShowIndex extends Component {
     }
 }
 
-export default ShowIndex;
+export default Index;
