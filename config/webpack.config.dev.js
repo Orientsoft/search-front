@@ -254,6 +254,7 @@ module.exports = {
     },
     devServer: devServer,
     externals: {
-        jquery: 'jQuery'
+        jquery: 'jQuery',
+        Dygraph: 'Dygraph'
     }
 };

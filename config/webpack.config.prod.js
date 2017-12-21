@@ -387,7 +387,8 @@ let config = {
         child_process: 'empty',
     },
     externals: {
-        jquery: 'jQuery'
+        jquery: 'jQuery',
+        Dygraph: 'Dygraph'
     }
 };
 

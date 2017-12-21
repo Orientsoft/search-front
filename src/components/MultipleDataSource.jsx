@@ -11,6 +11,11 @@ const Option = Select.Option;
 
 
 @observer class MultipleDataSource extends Component {
+    @observable hide = 'none'
+    
+    onAddData() {
+        this.hide = 'block'
+    }
     
     // @observable dataSources = []
     // @observable enableEdit = []
@@ -41,9 +46,9 @@ const Option = Select.Option;
 
     render() {
         return (
-            <Card>
+            <Card className='dataSource'>
                 <p className='headerManager'>定义多数据源：</p>
-                <Button type="primary" icon="plus">添加数据</Button>
+                <Button type="primary" icon="plus" onClick={() => this.onAddData()}>添加数据</Button>
                 {/* <div className='contentManager'>
                     <Row gutter={16}>
                         <Col span={5} className="gutter-row">名称:</Col>
@@ -51,7 +56,7 @@ const Option = Select.Option;
                     </Row>
                     <MultipleItem onSave={this.onItemSave} />
                 </div> */}
-                <MultipleItem  />
+                <MultipleItem  add = {this.hide}/>
                 {/* <div className='contentManager'>
                     { this.dataSources.map((item, key) => {
                         return (<Row gutter={16}>

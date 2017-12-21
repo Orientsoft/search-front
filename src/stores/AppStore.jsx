@@ -11,4 +11,7 @@ export default class AppStore {
     @observable.ref queryError = null;
     @observable singleDataNames = [];
     @observable currentAggs = [];
+    @observable multipleDataNames = [];
+    @observable.ref singleDataType = '';
+    @observable singleDatas = [];
 }
