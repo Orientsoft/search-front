@@ -10,6 +10,11 @@ import DataSourceItem from './DataSourceItem';
 const Option = Select.Option;
 
 @observer class SingleDataSource extends Component {
+    @observable hide = 'none'
+    
+    onAddData() {
+        this.hide = 'block'
+    }
 
     // @observable dataSource = []
     // @observable enableEdit = []
@@ -23,9 +28,9 @@ const Option = Select.Option;
 
     render() {
         return (
-            <Card>
+            <Card className='dataSource'>
                 <p className='headerManager'>定义单数据源：</p>
-                <Button type="primary" icon="plus">添加数据</Button>
+                <Button type="primary" icon="plus" onClick={() => this.onAddData()}>添加数据</Button>
                 {/* <div className='contentManager'>
                     <Row gutter={16}>
                         <Col span={3} className="gutter-row">类型:</Col>
@@ -36,7 +41,7 @@ const Option = Select.Option;
                     <DataSourceItem onSave={this.onItemSave} />
                 </div> */}
                 {/* <DataSourceItem onSave={this.onItemSave} /> */}
-                <DataSourceItem  />
+                <DataSourceItem add={this.hide} />
                 {/* <div className='contentManager'>
                     {this.dataSource.map((item, key) => {
                         return (<Row gutter={16} key={key}>

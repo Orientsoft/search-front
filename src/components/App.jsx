@@ -6,6 +6,7 @@ import Workspace from './Workspace';
 import LeftSidebar from './LeftSidebar';
 import MultipleDataSource from './MultipleDataSource';
 import SingleDataSource from './SingleDataSource';
+import SingleDataSearch from './SingleDataSearch';
 // import createBrowserHistory from 'history/createBrowserHistory'
 
 // const history = createBrowserHistory()
@@ -32,6 +33,7 @@ class App extends React.Component {
                     <LeftSidebar />
                     <Layout>
                         <Route path="/core" component={Workspace}></Route>
+                        <Route path="/singledataSearch" component={SingleDataSearch}></Route>
                         <Route path="/singledata" component={SingleDataSource}></Route>
                         <Route path="/multipledata" component={MultipleDataSource}></Route>
                     </Layout>
