@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { Tabs, Card } from 'antd';
 import Component from './Component';
 import SearchPanel from './SearchPanel';
-import SingleDataSource from './SingleDataSource';
 
 const TabPane = Tabs.TabPane;
 
@@ -19,8 +18,8 @@ const TabPane = Tabs.TabPane;
       <Card>
         <Tabs defaultActiveKey="1" onChange={this.onTabChange}>
           <TabPane tab="核心" key="1"><SearchPanel /></TabPane>
-          <TabPane tab="网络" key="2"><SingleDataSource /></TabPane>
-          <TabPane tab="支付" key="3">Content of Tab Pane 3</TabPane>
+          <TabPane tab="网络" key="2">tab 2</TabPane>
+          <TabPane tab="支付" key="3">tab3</TabPane>
         </Tabs>
       </Card>
     )

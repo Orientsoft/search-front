@@ -9,6 +9,8 @@ export default class AppStore {
         extendObservable(this, Object.assign({
             queryResult: observable.ref({}),
             queryError: observable.ref(null),
+            singleDatas:[],
+            multipleDataNames:[],
             currentAggs: []
         }, others));
     }
