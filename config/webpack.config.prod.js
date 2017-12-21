@@ -386,6 +386,9 @@ let config = {
         tls: 'empty',
         child_process: 'empty',
     },
+    externals: {
+        jquery: 'jQuery'
+    }
 };
 
 if(process.env.ANALYZE) {

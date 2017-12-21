@@ -252,6 +252,8 @@ module.exports = {
     performance: {
         hints: false,
     },
-    devServer: devServer
-
+    devServer: devServer,
+    externals: {
+        jquery: 'jQuery'
+    }
 };
