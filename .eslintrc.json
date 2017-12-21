@@ -13,6 +13,7 @@
         "no-useless-escape": "off",
         "no-plusplus": "off",
         "no-nested-ternary": "off",
+        "class-methods-use-this": "off",
         "comma-dangle": "off",
         "arrow-body-style": "off",
         "no-trailing-spaces": ["error", {

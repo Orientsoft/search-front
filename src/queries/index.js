@@ -4,27 +4,23 @@ import Query from './Query';
 import FullTextQuery from './FullTextQuery';
 import BucketAggregation from './BucketAggregation';
 
-export const buildDateRangeQuery = action((options = {}) => {
-    // 保存全局日期时间设置
-    store.appStore.startDate = options.startDate;
-    store.appStore.endDate = options.endDate;
-    store.appStore.timeInterval = options.timeInterval;
+export const buildDateRangeQuery = action((field, value) => {
     // 构造查询语句
-    const agg = new BucketAggregation(options.name);
+    const agg = new BucketAggregation(field);
     const query = new FullTextQuery();
     
     return new Query({
         bool: {
             filter: [
                 agg.range({
-                    [options.name]: {
-                        from: options.startDate,
-                        to: options.endDate
+                    [field]: {
+                        from: store.appStore.startDate,
+                        to: store.appStore.endDate
                     }
                 }).toJSON('aggs'),
                 query.matchPhrase({
-                    [options.name]: {
-                        query: options.value
+                    [field]: {
+                        query: value
                     }
                 }).toJSON('query')
             ]
