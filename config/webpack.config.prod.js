@@ -386,6 +386,7 @@ let config = {
         tls: 'empty',
         child_process: 'empty',
     },
+    externals: { Dygraph: 'Dygraph'}
 };
 
 if(process.env.ANALYZE) {
