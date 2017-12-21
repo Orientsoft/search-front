@@ -11,7 +11,8 @@ export default class AppStore {
             queryError: observable.ref(null),
             singleDatas:[],
             multipleDataNames:[],
-            currentAggs: []
+            currentAggs: [],
+            singleDataType:''
         }, others));
     }
 }

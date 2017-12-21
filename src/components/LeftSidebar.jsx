@@ -10,14 +10,20 @@ const { Sider } = Layout;
 const { SubMenu } = Menu;
 
 @observer class LeftSidebar extends Component {
+    singledataNames = ['db', 'weblogic', 'tuxedo', '业务', '系统']
 
     componentWillMount() {
         this.elastic.getMultipleDataSource().then(result => {
             this.appStore.multipleDataNames = get(result, 'hits.hits', []).map(data => data._source.name);
+            this.appStore.singleDataType = this.singledataNames[0]
         });
 
     }
-    allTypes = ['手机', '网络', '支付', '前置', 'ESB']
+    onMenuChange (e,key){
+       this.appStore.singleDataType = e
+       console.log('dataname',this.appStore.singleDataType)
+    }
+    
 
     render() {
         return (
@@ -32,14 +38,13 @@ const { SubMenu } = Menu;
                             {this.appStore.multipleDataNames.map((item, key) => {
                                 return (<Menu.Item key={key}><Link to="/core">{item}</Link></Menu.Item>)
                             })}
-                            {/* <Menu.Item key="1"><Link to="/core">核心</Link></Menu.Item>
-                            <Menu.Item key="2">手机</Menu.Item>
-                            <Menu.Item key="3">网络</Menu.Item>
-                            <Menu.Item key="4">支付</Menu.Item>
-                            <Menu.Item key="5">前置</Menu.Item>
-                            <Menu.Item key="6">ESB</Menu.Item> */}
                         </SubMenu>
-                        <Menu.Item key="singledataSearch"><Link to="/singledataSearch">单数据源查询</Link></Menu.Item>
+                        <SubMenu key="sub2" title={<span>单数据源查询</span>}>
+                            {this.singledataNames.map((item, key) => {
+                                return (<Menu.Item key={key}><Link to="/singledataSearch" key={key} onClick={(e,key) => this.onMenuChange(item,key)}>{item}</Link></Menu.Item>)
+                            })}
+                        </SubMenu>
+                        {/* <Menu.Item key="singledataSearch"><Link to="/singledataSearch">单数据源查询</Link></Menu.Item> */}
                         <Menu.Item key="historySearch"><Link to="/historySearch">历史查询记录</Link></Menu.Item>
                         <p className="searchManage">管理</p>
                         <Menu.Item key="singledata"><Link to="/singledata">单数据源配置</Link></Menu.Item>
