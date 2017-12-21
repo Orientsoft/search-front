@@ -1,18 +1,12 @@
 import React from 'react';
-import {
-    Form,
-    Input,
-    Radio,
-    Button,
-    Slider,
-    DatePicker
-} from 'antd';
+import { Row, Col, Form, Radio, Button, Select, DatePicker } from 'antd';
 import { action } from 'mobx';
+import * as moment from 'moment';
 import Component from './Component';
+import { buildDateRangeQuery } from '../queries';
 
 const FormItem = Form.Item;
-const { Search } = Input;
-const { RangePicker } = DatePicker;
+const { Option } = Select;
 const RadioGroup = Radio.Group;
 
 const formItemLayout = {
@@ -24,110 +18,148 @@ const formItemLayout = {
     }
 };
 
-const marks = {
-    0: '0',
-    26: '10',
-    37: '12',
-    100: {
-        style: {
-            color: '#f50',
-        },
-        label: <strong>24</strong>,
-    }
-};
+class SearchPanel extends Component {
+    // 时间粒度
+    timeSize = 'minute';
+    // 时间格式，'x'表示Unix毫秒时间戳
+    timeFormat = 'x';
 
-export default class SearchPanel extends Component {
-
-  // 想要搜索的数据
-  data = {}
-
-  render() {
-    return (
-      <div>
-        <Slider marks={marks} step={1} defaultValue={12} />
-        <Form>
-          <FormItem {...formItemLayout} label="快速选择">
-          <RadioGroup onChange={(e) => this.onTimeChange(e.target.value)}>
-            <Radio value={60}>1小时</Radio>
-            <Radio value={6 * 60}>6小时</Radio>
-            <Radio value={24 * 60}>一天</Radio>
-            <Radio value={7 * 24 * 60}>一周</Radio>
-          </RadioGroup>
-          </FormItem>
-          <FormItem {...formItemLayout} label="自定义时间">
-            <RangePicker showTime={{
-              hideDisabledOptions: true
-            }} format="YYYY-MM-DD HH:mm:ss" onChange={(date) => this.onDateChange(date)} />
-          </FormItem>
-          <FormItem {...formItemLayout} label="过滤字段">
-            <RadioGroup onChange={(e) => this.onFieldChange(e.target.value)}>
-              <Radio value={'TransCode'}>交易码</Radio>
-              <Radio value={'UseTime'}>耗时</Radio>
-              <Radio value={'TranName'}>交易内容</Radio>
-              <Radio value={'TranCode'}>非成功交易</Radio>
-            </RadioGroup>
-          </FormItem>
-          <FormItem {...formItemLayout} label="过滤条件">
-            <Search placeholder="Search..." enterButton onSearch={(value) => this.onSearch(value)} />
-          </FormItem>
-          <FormItem {...formItemLayout} label="查询条件">
-            <Button type="primary">保存查询条件</Button>
-          </FormItem>
-        </Form>
-      </div>
-    )
-  }
-
-  onTimeChange(value) {
-
-  }
-
-  onDateChange(date) {
-      this.data.datetime = {
-        from: date[0].toJSON(),
-        to: date[1].toJSON()
-      };
-  }
-
-  onFieldChange(field) {
-    this.data.field = field;
-  }
-
-  onSearch(value) {
-    const fieldValue = value;
-    const { datetime, field } = this.data;
-
-    this.elastic.search({
-      index: 'tpload-*',
-      body: {
-        aggs: {
-          [field]: {
-            date_histogram: {
-              field: '@TranTime',
-              interval: 'day',
-              format: "yyyy-MM-dd"
+    /**
+     * 限制时间选择范围
+     * 如果时间大于当前时间，则禁止选中
+     */
+    onDisabledTime(date, type) {
+        // 返回指定的范围
+        const range = (start = 0, end = 60) => Array(end - start).fill(1).map((v, i) => i + start + v);
+        // 如果开始日期或结束日期都是当天，则禁止选中当前时间之后的时间段
+        if (moment().isSame(date, 'day')) {
+            if (type === 'end') {
+                //this.queryStore.startMoment
             }
-          }
-        },
-        query: {
-          bool: {
-            filter: [{
-              range: {
-                '@TranTime': {
-                  from: datetime.from,
-                  to: datetime.to
-                }
-              }
-            }, {
-              match_phrase: {
-                [field]: {
-                  query: fieldValue
-                }
-              }
-            }]
-          }
+            return {
+                disabledHours: () => range(moment().hours(), 24),
+                disabledMinutes: () => range(moment().minutes(), 60)
+            };
         }
-      }
-    }).then(() => this.appStore.currentAggs.push(field));
-  }
+    }
+
+    /**
+     * 限制日期选择范围
+     * 如果日期大于当前日期，则禁止选中
+     */
+    onDisabledDate(date, type) {
+        const { startMoment, endMoment } = this.queryStore;
+
+        if (type === 'start') {
+            return endMoment.isBefore(date, this.timeSize);
+        }
+
+        return date.isBefore(startMoment, this.timeSize) || date.isAfter(moment(), this.timeSize);
+    }
+
+    @action.bound onSliderFinish(data) {
+        this.queryStore.startMoment = moment(data.from);
+        this.queryStore.endMoment = moment(data.to);
+    }
+
+    onInitDateTimeSlider(el) {
+        const { startMoment, endMoment, momentFormat } = this.queryStore;
+        const minMoment = startMoment.clone();
+        const maxMoment = endMoment.clone();
+
+        // 防止多次初始化
+        if (this.slider) this.slider.destroy();
+
+        jQuery(el).ionRangeSlider({
+            type: 'double',
+            min: +minMoment.startOf('day'),
+            max: +maxMoment.endOf('day'),
+            from: +startMoment,
+            to: +endMoment,
+            force_edges: true,
+            grid: true,
+            prettify: date => moment(date, this.timeFormat).locale('zh-cn').format(momentFormat),
+            onFinish: this.onSliderFinish
+        });
+        this.slider = jQuery(el).data('ionRangeSlider');
+    }
+
+    onFieldChange(field) {
+        
+    }
+
+    onSearch(value) {
+        // this.elastic.search(buildDateRangeQuery(this.field, value));
+    }
+
+    @action onDateTimeChange(date, type) {
+        const { startMoment, endMoment } = this.queryStore;
+        // 如果开始日期被改变，需要判断选择的日期时间是否比结束日期时间大
+        // 例如:
+        // 开始日期：2017-12-21 15:30
+        // 结束日期：2017-12-21 15:35
+        // 当在15:40改变开始时间，开始时间可以选中15:40，而结束时间是15:35，这时候应该调整结束时间
+        if (type === 'start') {
+            if (endMoment.isBefore(date, this.timeSize)) {
+                this.queryStore.endMoment = moment();
+            }
+            this.queryStore.startMoment = date;
+        } else {
+            // 如果结束日期时间被改变，需要限制它不能早于开始时间
+            if (date.isBefore(startMoment, this.timeSize)) {
+                this.queryStore.startMoment = date;
+            }
+            this.queryStore.endMoment = date;
+        }
+    }
+
+    render() {
+        return (
+            <div>
+                <Row type="flex" justify="space-between" align="middle" gutter={24}>
+                    <Col span={22}>
+                        <div ref={el => this.onInitDateTimeSlider(el)} />
+                    </Col>
+                    <Col span={2}>
+                        <Button size="large" type="primary">搜索</Button>
+                    </Col>
+                </Row>
+                <Form>
+                    <FormItem {...formItemLayout} label="日期范围">
+                        <DatePicker
+                            value={this.queryStore.startMoment}
+                            disabledDate={date => this.onDisabledDate(date, 'start')}
+                            disabledTime={date => this.onDisabledTime(date, 'start')}
+                            onChange={date => this.onDateTimeChange(date, 'start')}
+                            allowClear={false}
+                            format="YYYY-MM-DD HH:mm"
+                            showTime={{ format: 'HH:mm' }} />
+                        <span>&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                        <DatePicker
+                            value={this.queryStore.endMoment}
+                            disabledDate={date => this.onDisabledDate(date, 'end')}
+                            disabledTime={date => this.onDisabledTime(date, 'end')}
+                            onChange={date => this.onDateTimeChange(date, 'end')}
+                            allowClear={false}
+                            format="YYYY-MM-DD HH:mm"
+                            showTime={{ format: 'HH:mm' }} />
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="过滤字段">
+                        <RadioGroup onChange={e => this.onFieldChange(e.target.value)}>
+                            <Radio value="TransCode">交易码</Radio>
+                            <Radio value="UseTime">耗时</Radio>
+                            <Radio value="TranName">交易内容</Radio>
+                            <Radio value="TranCode">非成功交易</Radio>
+                        </RadioGroup>
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="条件筛选">
+                        <Select mode="tags" style={{ width: '50%' }} onChange={value => this.onSearch(value)} tokenSeparators={[',', ' ']} />
+                        <Button type="primary">保存查询条件</Button>
+                    </FormItem>
+                </Form>
+            </div>
+        )
+    }
 }
+
+export default SearchPanel;
