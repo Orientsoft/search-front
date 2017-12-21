@@ -252,6 +252,7 @@ module.exports = {
     performance: {
         hints: false,
     },
-    devServer: devServer
+    devServer: devServer,
+    externals: { Dygraph: 'Dygraph'}
 
 };

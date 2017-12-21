@@ -28,6 +28,7 @@
     "axios": "^0.17.1",
     "babel-polyfill": "^6.26.0",
     "dotenv": "^4.0.0",
+    "echarts": "^3.8.5",
     "elasticsearch": "^14.0.0",
     "history": "^4.7.2",
     "intl": "^1.2.5",

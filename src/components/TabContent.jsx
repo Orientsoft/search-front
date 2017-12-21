@@ -4,7 +4,8 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import G2 from '@antv/g2';
 import Component from './Component';
-import Chart from './Chart';
+// import Chart from './Chart';
+import ReactChart from './ReactChart'
 
 const Panel = Collapse.Panel;
 const TabPane = Tabs.TabPane;
@@ -41,7 +42,7 @@ const pagination = {
 				key: '' + key,
 				date: hit._source['@TranTime'],
 				type: hit._type,
-				data: JSON.stringify(hit._source), 
+				data: JSON.stringify(hit._source),
 				hit: hit
 			}
 		});
@@ -72,13 +73,13 @@ const pagination = {
 			width: '5%',
 			render: (text) => <Button type="primary" onClick={() => this.showModal(text)}>详情</Button>
 		}]
-		console.log(this.chartData)
 		return (
 			<div className="tabContent">
 				<Card>
 					<Tabs defaultActiveKey="1">
 						<TabPane tab="图表" key="1">
-							{this.chartData.length > 0 && <Chart data={this.chartData} />}
+							{/* this.chartData.length > 0 && <Chart data={this.chartData} /> */}
+							<ReactChart />
 						</TabPane>
 						<TabPane tab="详情" key="2">
 							{this.tableData.length > 0 && <Table columns={columns} dataSource={this.tableData} pagination={pagination} ></Table>}
@@ -114,11 +115,9 @@ const pagination = {
 		this.setState({
 			visible: true
 		})
-				this.setState({
-					showModalData: text
-				})
-			
-		
+		this.setState({
+			showModalData: text
+		})
 	}
 	hideModal() {
 		this.setState({
