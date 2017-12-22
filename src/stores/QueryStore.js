@@ -6,8 +6,9 @@ import * as moment from 'moment';
  * 只定义需要共享的查询参数，不需要作为查询参数的应该在AppStore里定义
  */
 export default class QueryStore {
+    
     // 日期格式
-    @observable.ref momentFormat = 'YYYY-MM-DD hh:mm';
+    @observable.ref momentFormat = 'YYYY-MM-DD HH:mm:ss';
     // 开始日期
     @observable.ref startMoment = moment().startOf('day');
     // 结束日期

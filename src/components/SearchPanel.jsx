@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Form, Radio, Button, Select, DatePicker } from 'antd';
+import { Row, Col, Form, Checkbox, Button, Select, DatePicker } from 'antd';
 import { action } from 'mobx';
 import * as moment from 'moment';
 import Component from './Component';
@@ -7,7 +7,7 @@ import { buildDateRangeQuery } from '../queries';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-const RadioGroup = Radio.Group;
+const CheckboxGroup = Checkbox.Group;
 
 const formItemLayout = {
     labelCol: {
@@ -31,14 +31,13 @@ class SearchPanel extends Component {
     onDisabledTime(date, type) {
         // 返回指定的范围
         const range = (start = 0, end = 60) => Array(end - start).fill(1).map((v, i) => i + start + v);
+        
         // 如果开始日期或结束日期都是当天，则禁止选中当前时间之后的时间段
         if (moment().isSame(date, 'day')) {
-            if (type === 'end') {
-                //this.queryStore.startMoment
-            }
             return {
                 disabledHours: () => range(moment().hours(), 24),
-                disabledMinutes: () => range(moment().minutes(), 60)
+                disabledMinutes: () => range(moment().minutes(), 60),
+                disabledSeconds: () => range(moment().seconds(), 60)
             };
         }
     }
@@ -57,31 +56,43 @@ class SearchPanel extends Component {
         return date.isBefore(startMoment, this.timeSize) || date.isAfter(moment(), this.timeSize);
     }
 
-    @action.bound onSliderFinish(data) {
+    /**
+     * ionRangeSlider插件拖动完成回调
+     * 松开鼠标时更新全局日期时间范围
+     */
+    @action.bound onDateTimeSliderFinish(data) {
         this.queryStore.startMoment = moment(data.from);
         this.queryStore.endMoment = moment(data.to);
     }
 
+    /**
+     * 初始化ionRangeSlider插件
+     */
     onInitDateTimeSlider(el) {
         const { startMoment, endMoment, momentFormat } = this.queryStore;
-        const minMoment = startMoment.clone();
-        const maxMoment = endMoment.clone();
 
-        // 防止多次初始化
+        // 清除旧配置，重新加载插件
         if (this.slider) this.slider.destroy();
 
         jQuery(el).ionRangeSlider({
             type: 'double',
-            min: +minMoment.startOf('day'),
-            max: +maxMoment.endOf('day'),
-            from: +startMoment,
-            to: +endMoment,
-            force_edges: true,
             grid: true,
+            force_edges: true,
+            max: +endMoment.clone().endOf('day'),
+            min: +startMoment.clone().startOf('day'),
             prettify: date => moment(date, this.timeFormat).locale('zh-cn').format(momentFormat),
-            onFinish: this.onSliderFinish
+            onFinish: this.onDateTimeSliderFinish
         });
-        this.slider = jQuery(el).data('ionRangeSlider');
+        
+        this.slider = jQuery(el).data('ionRangeSlider');        
+        // 插件没有添加到真实DOM之前，获取不到slider，此处需要判断是否slider已显示
+        // 如果slider已经显示在页面上，则更新它的日期时间范围
+        if (this.slider) {
+            this.slider.update({
+                from: +startMoment,
+                to: +endMoment
+            });
+        }
     }
 
     onFieldChange(field) {
@@ -92,7 +103,7 @@ class SearchPanel extends Component {
         // this.elastic.search(buildDateRangeQuery(this.field, value));
     }
 
-    @action onDateTimeChange(date, type) {
+    @action.bound onDateTimeChange(date, type) {
         const { startMoment, endMoment } = this.queryStore;
         // 如果开始日期被改变，需要判断选择的日期时间是否比结束日期时间大
         // 例如:
@@ -132,8 +143,8 @@ class SearchPanel extends Component {
                             disabledTime={date => this.onDisabledTime(date, 'start')}
                             onChange={date => this.onDateTimeChange(date, 'start')}
                             allowClear={false}
-                            format="YYYY-MM-DD HH:mm"
-                            showTime={{ format: 'HH:mm' }} />
+                            showTime
+                            format="YYYY-MM-DD HH:mm:ss" />
                         <span>&nbsp;&nbsp;~&nbsp;&nbsp;</span>
                         <DatePicker
                             value={this.queryStore.endMoment}
@@ -141,16 +152,16 @@ class SearchPanel extends Component {
                             disabledTime={date => this.onDisabledTime(date, 'end')}
                             onChange={date => this.onDateTimeChange(date, 'end')}
                             allowClear={false}
-                            format="YYYY-MM-DD HH:mm"
-                            showTime={{ format: 'HH:mm' }} />
+                            showTime
+                            format="YYYY-MM-DD HH:mm:ss" />
                     </FormItem>
                     <FormItem {...formItemLayout} label="过滤字段">
-                        <RadioGroup onChange={e => this.onFieldChange(e.target.value)}>
-                            <Radio value="TransCode">交易码</Radio>
-                            <Radio value="UseTime">耗时</Radio>
-                            <Radio value="TranName">交易内容</Radio>
-                            <Radio value="TranCode">非成功交易</Radio>
-                        </RadioGroup>
+                        <CheckboxGroup options={[
+                            { label: '交易码', value: 'TransCode' },
+                            { label: '耗时', value: 'UseTime' },
+                            { label: '交易内容', value: 'TranName' },
+                            { label: '非成功交易', value: 'TranCode' }
+                        ]} Change={value => this.onFieldChange(value)} />
                     </FormItem>
                     <FormItem {...formItemLayout} label="条件筛选">
                         <Select mode="tags" style={{ width: '50%' }} onChange={value => this.onSearch(value)} tokenSeparators={[',', ' ']} />
