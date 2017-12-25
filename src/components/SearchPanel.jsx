@@ -3,7 +3,7 @@ import { Row, Col, Form, Checkbox, Button, Select, DatePicker } from 'antd';
 import { action } from 'mobx';
 import * as moment from 'moment';
 import Component from './Component';
-import { buildDateRangeQuery } from '../queries';
+import queryDetailsByFieldAndValue from '../queries';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -100,6 +100,7 @@ class SearchPanel extends Component {
     }
 
     onSearch(value) {
+        console.log(queryDetailsByFieldAndValue('TranCode', 'hello'));
         // this.elastic.search(buildDateRangeQuery(this.field, value));
     }
 
