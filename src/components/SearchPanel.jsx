@@ -132,7 +132,7 @@ class SearchPanel extends Component {
                         <div ref={el => this.onInitDateTimeSlider(el)} />
                     </Col>
                     <Col span={2}>
-                        <Button size="large" type="primary">搜索</Button>
+                        <Button size="large" type="primary" onClick={() => this.onSearch()}>搜索</Button>
                     </Col>
                 </Row>
                 <Form>
@@ -164,8 +164,12 @@ class SearchPanel extends Component {
                         ]} Change={value => this.onFieldChange(value)} />
                     </FormItem>
                     <FormItem {...formItemLayout} label="条件筛选">
-                        <Select mode="tags" style={{ width: '50%' }} onChange={value => this.onSearch(value)} tokenSeparators={[',', ' ']} />
-                        <Button type="primary">保存查询条件</Button>
+                        <Col span={20}>
+                            <Select mode="tags" onChange={value => this.onSearch(value)} tokenSeparators={[',', ' ']} />
+                        </Col>
+                        <Col span={3} offset={1}>
+                            <Button type="primary">保存查询条件</Button>
+                        </Col>
                     </FormItem>
                 </Form>
             </div>

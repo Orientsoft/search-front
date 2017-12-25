@@ -1,15 +1,13 @@
-import { extendObservable } from 'mobx';
+import mobx, { observable } from 'mobx';
 import isString from 'lodash/isString';
 import merge from 'lodash/merge';
 import get from 'lodash/get';
 
 class Aggregation {
     constructor(name, initialAgg = {}) {
-        extendObservable(this, {
-            body: {
-                aggs: {
-                    [name]: initialAgg
-                }
+        this.body = observable({
+            aggs: {
+                [name]: initialAgg
             }
         });
     }
@@ -22,7 +20,7 @@ class Aggregation {
     }
 
     toJSON(path) {
-        const body = this.body.toJS();
+        const body = mobx.toJS(this.body);
 
         if (isString(path) || Array.isArray(path)) {
             return get(body, path, {});
