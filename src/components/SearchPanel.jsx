@@ -100,8 +100,8 @@ class SearchPanel extends Component {
     }
 
     onSearch(value) {
-        console.log(queryDetailsByFieldAndValue('TranCode', 'hello'));
-        // this.elastic.search(buildDateRangeQuery(this.field, value));
+        console.log(this.requestBody);
+        // this.elastic.search();
     }
 
     @action.bound onDateTimeChange(date, type) {

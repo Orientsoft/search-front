@@ -1,18 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { observer } from 'mobx-react';
+import { observer, action } from 'mobx-react';
 import get from 'lodash/get';
+import RequestBody from '../queries/RequestBody';
 
 /**
  * 组件基类
  * 所有的组件都应该继承自这个组件，以便能方便的获取store、elastic实例以及得到查询结果中的数据
  */
 @observer class Component extends React.Component {
-
+	// 类型检查
     static contextTypes = {
         store: PropTypes.object.isRequired,
         elastic: PropTypes.object.isRequired
-    };
+	};
+	
+	constructor(props) {
+		super(props)
+		this.requestBody = new RequestBody();
+	}
 
 	/**
 	 * 对this.props.store的简写
@@ -46,7 +52,7 @@ import get from 'lodash/get';
 	*/
     get elastic() {
         return this.context.elastic;
-    }
+	}
 
 	/**
 	 * 获取结果中的hits数据

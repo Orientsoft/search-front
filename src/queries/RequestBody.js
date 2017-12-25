@@ -1,6 +1,7 @@
-import { observable } from 'mobx';
+import mobx, { observable } from 'mobx';
 import Query from './core/Query';
 import Aggregation from './core/Aggregation';
+import merge from 'lodash/merge';
 
 /**
  * Elasticsearch查询JSON封装
@@ -84,8 +85,10 @@ class RequestBody {
      */
     toJSON() {
         return merge(mobx.toJS(this.body), this.queries.reduce((body, query) => {
-            if (query instanceof Query || query instanceof Aggregation) {
-                return merge(body, query.toJSON());
+            if (query instanceof Query) {
+                return merge(body, { query: query.toJSON() });
+            } else if (query instanceof Aggregation) {
+                return merge(body, { aggs: query.toJSON() });
             }
 
             return merge(body, query);
