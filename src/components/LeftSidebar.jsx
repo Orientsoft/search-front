@@ -1,5 +1,6 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
+import { observer } from 'mobx-react';
 import get from 'lodash/get';
 import { Link } from 'react-router-dom'
 import { Layout, Menu } from 'antd';
@@ -8,7 +9,7 @@ import Component from './Component';
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-class LeftSidebar extends Component {
+@observer class LeftSidebar extends Component {
     singledataNames = ['db', 'weblogic', 'tuxedo', '业务', '系统']
 
     componentWillMount() {
