@@ -13,7 +13,7 @@ const pagination = {
 	defaultPageSize: 5
 }
 
-@observer class TabContent extends Component {
+class TabContent extends Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {

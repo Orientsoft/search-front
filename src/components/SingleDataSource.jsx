@@ -1,6 +1,5 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
-import { observer } from 'mobx-react';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import { Row, Col, Input, Button, Icon, Select, Card } from 'antd';
@@ -9,7 +8,7 @@ import DataSourceItem from './DataSourceItem';
 
 const Option = Select.Option;
 
-@observer class SingleDataSource extends Component {
+class SingleDataSource extends Component {
     @observable hide = 'none'
     
     onAddData() {

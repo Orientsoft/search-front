@@ -1,11 +1,10 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
-import { observer } from 'mobx-react';
 import { Card, Row, Col, Select, Input, Button,Radio } from 'antd';
 import Component from './Component';
 import get from 'lodash/get';
 
-@observer class SingleDataContent extends Component {
+class SingleDataContent extends Component {
     // componentWillMount() {
     //     this.elastic.getSingleDataSource().then(result => {
     //         this.appStore.singleDatas = get(result, 'hits.hits', []).map(data => data._source);

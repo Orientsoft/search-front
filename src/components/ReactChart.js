@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
+import Component from './Component';
+
 //数据结构
 var data = [
     {title: 'DB', data: [[0, 73], [1, 64], [2, 54], [3, 12], [4, 33], [5, 93], [6, 34], [7, 14], [8, 43], [9, 94], [10, 63], [11, 88]]}, 
@@ -9,7 +11,6 @@ var data = [
 
 class ReactChart extends Component {
     constructor(props, context) {
-        console.log('进入了');
         super(props, context);
         this.charts = [];
         this.state = {

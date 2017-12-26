@@ -1,6 +1,5 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
-import { observer } from 'mobx-react';
 import { Tabs, Card } from 'antd';
 import get from 'lodash/get';
 import Component from './Component';
@@ -9,7 +8,7 @@ import TabContent from './TabContent'
 import SearchPanel from './SearchPanel'
 const TabPane = Tabs.TabPane;
 
-@observer class SingleDataSearch extends Component {
+class SingleDataSearch extends Component {
     @observable tabs = []
     @observable allDatas = []
     // @observable sources = []

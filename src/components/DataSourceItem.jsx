@@ -1,6 +1,5 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
-import { observer } from 'mobx-react';
 import { Row, Col, Select, Input, Button, Modal } from 'antd';
 import get from 'lodash/get';
 import Component from './Component';
@@ -8,7 +7,7 @@ import Component from './Component';
 const Option = Select.Option;
 const confirm = Modal.confirm;
 
-@observer class DataSourceItem extends Component {
+class DataSourceItem extends Component {
 
     @observable.ref types = ['db', 'weblogic', 'tuxedo', '业务', '系统']
     @observable.ref fields = []
