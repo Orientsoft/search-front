@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { observer, action } from 'mobx-react';
 import get from 'lodash/get';
 import RequestBody from '../queries/RequestBody';
 
@@ -8,7 +7,7 @@ import RequestBody from '../queries/RequestBody';
  * 组件基类
  * 所有的组件都应该继承自这个组件，以便能方便的获取store、elastic实例以及得到查询结果中的数据
  */
-@observer class Component extends React.Component {
+class Component extends React.Component {
 	// 类型检查
     static contextTypes = {
         store: PropTypes.object.isRequired,
