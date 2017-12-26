@@ -98,7 +98,7 @@ class DataSourceItem extends Component {
                 </div>
                 <div className='contentManager'>
                     {this.dataSources.map((item, key) => {
-                        return (<Row gutter={16}>
+                        return (<Row key={key} gutter={16}>
                             <Col span={4} className="gutter-row">
                                 <Input value={item.name} disabled />
                             </Col>
