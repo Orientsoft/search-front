@@ -32,7 +32,7 @@ class LeftSidebar extends Component {
                 </div>
                 <Menu mode="inline" theme="dark">
                     <SubMenu key="top" title="Analyze">
-                        <p className="searchManage">查询</p>
+                        <Menu.Item key="1" className="searchManage">查询</Menu.Item>
                         <SubMenu key="sub1" title={<span>联合查询</span>}>
                             {this.appStore.multipleDataNames.map((item, key) => {
                                 return (<Menu.Item key={key}><Link to="/core">{item}</Link></Menu.Item>)
@@ -45,7 +45,7 @@ class LeftSidebar extends Component {
                         </SubMenu>
                         {/* <Menu.Item key="singledataSearch"><Link to="/singledataSearch">单数据源查询</Link></Menu.Item> */}
                         <Menu.Item key="historySearch"><Link to="/historySearch">历史查询记录</Link></Menu.Item>
-                        <p className="searchManage">管理</p>
+                        <Menu.Item key="2" className="searchManage">管理</Menu.Item>
                         <Menu.Item key="singledata"><Link to="/singledata">单数据源配置</Link></Menu.Item>
                         <Menu.Item key="multipledata"><Link to="/multipledata">多数据源配置</Link></Menu.Item>
                     </SubMenu>
