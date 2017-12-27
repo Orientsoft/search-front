@@ -2,7 +2,8 @@ import React from 'react';
 import { Tabs, Table, Button, Modal, Card, Collapse } from 'antd';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import G2 from '@antv/g2';
+import set from 'lodash/set';
+import forEach from 'lodash/forEach';
 import Component from './Component';
 // import Chart from './Chart';
 import ReactChart from './ReactChart'
@@ -13,7 +14,7 @@ const pagination = {
 	defaultPageSize: 5
 }
 
-class TabContent extends Component {
+@observer class TabContent extends Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
@@ -38,6 +39,9 @@ class TabContent extends Component {
 
 	@computed get tableData() {
 		return this.getHits().map((hit, key) => {
+			forEach(hit.highlight, (value, key) => {
+				set(hit._source, key, value.toString());
+			});
 			return {
 				key: '' + key,
 				date: hit._source['@TranTime'],
@@ -65,7 +69,7 @@ class TabContent extends Component {
 			dataIndex: 'data',
 			key: 'data',
 			width: '60%',
-			render: (text) => <p className="wordBreak">{text}</p>
+			render: (text) => <p className="wordBreak" dangerouslySetInnerHTML={{ __html: text }} />
 		}, {
 			title: '详情',
 			dataIndex: 'hit',
@@ -111,7 +115,6 @@ class TabContent extends Component {
 	}
 
 	showModal(text) {
-		console.log(text, typeof text);
 		this.setState({
 			visible: true
 		})
