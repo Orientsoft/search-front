@@ -4,7 +4,7 @@ import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import * as moment from 'moment';
 import Component from './Component';
-import queryDetailsByFieldAndValue from '../queries';
+import fieldFilter from '../queries/filters/datetime/field';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -103,8 +103,10 @@ const formItemLayout = {
     }
 
     onSearch(value) {
-        console.log(this.requestBody);
-        // this.elastic.search();
+        const requestBody = this.requestBody.index('core-*').add(fieldFilter('message.status', 'active')).highlight(['message.status']).toJSON();
+        console.log(requestBody)
+        
+        this.elastic.search(requestBody);
     }
 
     @action.bound onDateTimeChange(date, type) {

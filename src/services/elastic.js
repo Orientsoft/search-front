@@ -28,7 +28,6 @@ export default {
     search: (query) => {
         return client.search(query).then((result) => {
             store.appStore.queryResult = result;
-            console.log(store.appStore.currentAggs);
             return result;
         }).catch(throwQueryError('search()'));
     },

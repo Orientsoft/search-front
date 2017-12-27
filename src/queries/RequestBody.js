@@ -1,4 +1,5 @@
 import mobx, { observable } from 'mobx';
+import queryStore from '../stores/QueryStore';
 import Query from './core/Query';
 import Aggregation from './core/Aggregation';
 import merge from 'lodash/merge';
@@ -7,12 +8,19 @@ import isPlainObject from 'lodash/isPlainObject';
 
 /**
  * Elasticsearch查询JSON封装
+ * @class
  */
 class RequestBody {
     // 保存通过方法调用(例如：add())添加的查询对象，可以是任何值
     @observable queries = [];
-    // 保存只通过方法调用修改而不添加的查询对象，例如index、type、from等等
-    @observable body = {};
+    
+    constructor(initialBody) {
+        // 保存只通过方法调用修改而不添加的查询对象，例如index、type、from等等
+        this.body = observable(isPlainObject(initialBody) ? initialBody : {
+            index: queryStore.index.toString(),
+            body: {}
+        });
+    }
 
     /**
      * 对JS原始值进行装箱，以便能追踪变量改动
@@ -38,7 +46,9 @@ class RequestBody {
      * @return {RequestBody}
      */
     index(value) {
-        return this.__box('index', value);
+        this.body.index = value;
+
+        return this;
     }
 
     /**
@@ -47,7 +57,9 @@ class RequestBody {
      * @return {RequestBody}
      */
     type(value) {
-        return this.__box('type', value);
+        this.body.type = value;
+
+        return this;
     }
 
     /**
@@ -60,12 +72,12 @@ class RequestBody {
     }
 
     /**
-     * 设置分页结束的位置
-     * @param {Number} value - 分页结束索引
+     * 设置分页大小
+     * @param {Number} value - 分页大小
      * @return {RequestBody}
      */
-    to(value) {
-        return this.__box('to', value);
+    size(value) {
+        return this.__box('size', value);
     }
 
     /**
@@ -75,20 +87,20 @@ class RequestBody {
      * @return {RequestBody}
      */
     highlight(fields, options = {}) {
-        if (!this.body.hasOwnProperty('highlight')) {
-            this.body.highlight = {
+        if (!this.body.body.hasOwnProperty('highlight')) {
+            this.body.body.highlight = {
                 fields: {}
             };
         }
         {
             const { fields, ...others } = options;
-            merge(this.body.highlight, {...others});
+            merge(this.body.body.highlight, {...others});
         }
         fields.forEach(field => {
             if (isString(field)) {
-                this.body.highlight.fields[field] = {};
+                this.body.body.highlight.fields[field] = {};
             } else if (isPlainObject(field)) {
-                merge(this.body.highlight.fields, field);
+                merge(this.body.body.highlight.fields, field);
             }
         });
 
@@ -114,15 +126,17 @@ class RequestBody {
      * 得到查询JSON，可以直接用于elastic.search()等方法
      */
     toJSON() {
-        return merge(mobx.toJS(this.body), this.queries.reduce((body, query) => {
-            if (query instanceof Query) {
-                return merge(body, { query: query.toJSON() });
-            } else if (query instanceof Aggregation) {
-                return merge(body, { aggs: query.toJSON() });
-            }
+        return merge(mobx.toJS(this.body), {
+            body: this.queries.reduce((body, query) => {
+                if (query instanceof Query) {
+                    return merge(body, { query: query.toJSON() });
+                } else if (query instanceof Aggregation) {
+                    return merge(body, { aggs: query.toJSON() });
+                }
 
-            return merge(body, query);
-        }, {}));
+                return merge(body, query);
+            }, mobx.toJS(this.body.body))
+        });
     }
 }
 

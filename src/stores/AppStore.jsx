@@ -4,7 +4,7 @@ import { observable, extendObservable } from 'mobx';
  * 应用级Store
  * 保存全局数据、状态及方法
  */
-class AppStore {
+export class AppStore {
     constructor() {
         extendObservable(this, {
             // 保存全局查询结果
