@@ -48,7 +48,7 @@
 .irs-shadow {
     height: 5px; top: 25px;
     background: #000;
-    opacity: 0.25;
+    opacity: 0.15;
 }
 .lt-ie9 .irs-shadow {
     filter: alpha(opacity=25);
@@ -99,6 +99,7 @@
     bottom: 12px;
     color: #c0c0c0;
 }
+/*
 .irs-disable-mask {
 
 }
@@ -108,3 +109,4 @@
 .lt-ie9 .irs-disabled {
 
 }
+*/

@@ -78,7 +78,9 @@ const formItemLayout = {
         jQuery(el).ionRangeSlider({
             type: 'double',
             grid: true,
+            to_shadow: true,
             force_edges: true,
+            to_max: +endMoment,
             max: +endMoment.clone().endOf('day'),
             min: +startMoment.clone().startOf('day'),
             prettify: date => moment(date, this.timeFormat).locale('zh-cn').format(momentFormat),
