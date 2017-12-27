@@ -2,6 +2,8 @@ import mobx, { observable } from 'mobx';
 import Query from './core/Query';
 import Aggregation from './core/Aggregation';
 import merge from 'lodash/merge';
+import isString from 'lodash/isString';
+import isPlainObject from 'lodash/isPlainObject';
 
 /**
  * Elasticsearch查询JSON封装
@@ -14,6 +16,7 @@ class RequestBody {
 
     /**
      * 对JS原始值进行装箱，以便能追踪变量改动
+     * @private
      * @param {String} key - 字段名
      * @param {String|Number} value - 字段值
      * @return {RequestBody}
@@ -63,6 +66,33 @@ class RequestBody {
      */
     to(value) {
         return this.__box('to', value);
+    }
+
+    /**
+     * 设置需要高亮返回的字段
+     * @param {Array} fields - 需要高亮的字段集合
+     * @param {Object} [options] - 配置选项
+     * @return {RequestBody}
+     */
+    highlight(fields, options = {}) {
+        if (!this.body.hasOwnProperty('highlight')) {
+            this.body.highlight = {
+                fields: {}
+            };
+        }
+        {
+            const { fields, ...others } = options;
+            merge(this.body.highlight, {...others});
+        }
+        fields.forEach(field => {
+            if (isString(field)) {
+                this.body.highlight.fields[field] = {};
+            } else if (isPlainObject(field)) {
+                merge(this.body.highlight.fields, field);
+            }
+        });
+
+        return this;
     }
 
     /**
