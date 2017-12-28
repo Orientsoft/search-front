@@ -9,11 +9,11 @@ import RequestBody from '../queries/RequestBody';
  */
 class BaseComponent extends React.Component {
 	// 类型检查
-    static contextTypes = {
-        store: PropTypes.object.isRequired,
-        elastic: PropTypes.object.isRequired
+	static contextTypes = {
+		store: PropTypes.object.isRequired,
+		elastic: PropTypes.object.isRequired
 	};
-	
+
 	constructor(props) {
 		super(props)
 		this.requestBody = new RequestBody();
@@ -23,18 +23,18 @@ class BaseComponent extends React.Component {
 	 * 对this.props.store的简写
 	 * 使用方法：this.store
 	 */
-    get store() {
-        return this.context.store;
-    }
+	get store() {
+		return this.context.store;
+	}
 
 	/**
 	 * 对this.props.store.appStore的简写，用于获取store中appStore
 	 * 使用方法：this.appStore
 	 */
-    get appStore() {
-        return this.context.store.appStore;
+	get appStore() {
+		return this.context.store.appStore;
 	}
-	
+
 	/**
 	 * 对this.props.store.queryStore的简写，用于获取store中queryStore
 	 * 使用方法：this.queryStore
@@ -49,8 +49,8 @@ class BaseComponent extends React.Component {
 	 * 而不是elasticsearch.Client的实例
 	 * 使用方法：this.elastic
 	*/
-    get elastic() {
-        return this.context.elastic;
+	get elastic() {
+		return this.context.elastic;
 	}
 
 	/**
@@ -59,11 +59,11 @@ class BaseComponent extends React.Component {
 	 * @param {Object} [result] - 查询结果，不传时从appStore.queryResult中获取
 	 * @return {Array}
 	 */
-    getHits(result) {
+	getHits(result) {
 		const queryResult = result || this.appStore.queryResult;
 
-        return get(queryResult, 'hits.hits', []);
-    }
+		return get(queryResult, 'hits.hits', []);
+	}
 
 	/**
 	 * 获取结果中的buckets数据
@@ -72,11 +72,11 @@ class BaseComponent extends React.Component {
 	 * @param {Object} [result] - 查询结果，不传时从appStore.queryResult中获取
 	 * @return {Array}
 	 */
-    getBuckets(agg, result) {
+	getBuckets(agg, result) {
 		const queryResult = result || this.appStore.queryResult;
 
-        return get(queryResult, `aggregations.${agg}.buckets`, []);
-    }
+		return get(queryResult, `aggregations.${agg}.buckets`, []);
+	}
 }
 
 export default BaseComponent;

@@ -8,6 +8,8 @@ import LeftSidebar from './LeftSidebar';
 import MultipleDataSource from './MultipleDataSource';
 import SingleDataSource from './SingleDataSource';
 import SingleDataSearch from './SingleDataSearch';
+import Topology from './Topology';
+
 // import createBrowserHistory from 'history/createBrowserHistory'
 
 // const history = createBrowserHistory()
@@ -38,6 +40,7 @@ class App extends React.Component {
                         <Route path="/singledataSearch" component={SingleDataSearch}></Route>
                         <Route path="/singledata" component={SingleDataSource}></Route>
                         <Route path="/multipledata" component={MultipleDataSource}></Route>
+                        <Route path="/topology" component={Topology}></Route>
                     </Layout>
                 </Layout>
             </Router>

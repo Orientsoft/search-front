@@ -123,7 +123,7 @@ export default {
             id: Buffer.from(name).toString('base64')
         }).catch(throwQueryError('deleteMultipleDataSource()'));
     },
-    /**获取多数据源数据 */
+    /** 获取多数据源数据 */
     getMultipleDataSource: (name) => {
         let query = {
             index: 'query',
@@ -139,25 +139,25 @@ export default {
         return client.search(query).catch(throwQueryError('search()'));
     },
 
-    //修改单数据源
+    // 修改单数据源
     updateSingleDataSource: (name, data) => {
         return client.update({
             index: 'query',
             type: 'single',
             id: Buffer.from(name).toString('base64'),
             body: {
-                doc:data
+                doc: data
             }
         }).catch(throwQueryError('updateSingleDataSource()'));
     },
-    //修改多数据源
+    // 修改多数据源
     updateMultipleDataSource: (name, data) => {
         return client.update({
             index: 'query',
             type: 'multiple',
             id: Buffer.from(name).toString('base64'),
             body: {
-                doc:data
+                doc: data
             }
         }).catch(throwQueryError('updateMultipleDataSource()'));
     }

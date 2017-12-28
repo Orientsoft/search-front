@@ -33,10 +33,10 @@ const { SubMenu } = Menu;
                     <span>大数据智能运维平台</span>
                 </div>
                 <Menu mode="inline" theme="dark">
-                    <SubMenu key="top" title="系统拓扑">
-                        <Menu.Item key="topology" className="topology">拓扑分析</Menu.Item>
+                    <SubMenu key="top01" title="系统拓扑">
+                        <Menu.Item key="topology" className="topology"><Link to="/topology">拓扑分析</Link></Menu.Item>
                     </SubMenu>
-                    <SubMenu key="top" title="数据分析">
+                    <SubMenu key="top02" title="数据分析">
                         <Menu.Item key="1" className="searchManage">查询</Menu.Item>
                         <SubMenu key="sub1" title={<span>系统查询</span>}>
                             {this.appStore.multipleDataNames.map((item, key) => {
