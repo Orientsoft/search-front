@@ -69,8 +69,8 @@ const confirm = Modal.confirm;
             <div>
                 <div className='contentManager'>
                     <Row gutter={16}>
-                        <Col span={5} className="gutter-row">名称:</Col>
-                        <Col span={12} className="gutter-row">数据源:</Col>
+                        <Col span={4} className="gutter-row">名称:</Col>
+                        <Col span={15} className="gutter-row">数据源:</Col>
                     </Row>
 
                     <Row gutter={16} style={{ display: this.props.add }}>
