@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Table } from 'antd';
-import Component from './Component';
+import BaseComponent from './BaseComponent';
 
 const pagination = {
 	defaultPageSize: 5
@@ -43,7 +43,7 @@ const result = [{
 	type: 'D',
 	data: detailString
 }]
-class Index extends Component {
+class Index extends BaseComponent {
     constructor(props, context) {
         super(props, context);
         this.state = {

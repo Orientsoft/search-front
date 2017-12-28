@@ -4,8 +4,7 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import set from 'lodash/set';
 import forEach from 'lodash/forEach';
-import Component from './Component';
-// import Chart from './Chart';
+import BaseComponent from './BaseComponent';
 import ReactChart from './ReactChart'
 
 const Panel = Collapse.Panel;
@@ -14,7 +13,7 @@ const pagination = {
 	defaultPageSize: 5
 }
 
-@observer class TabContent extends Component {
+@observer class TabContent extends BaseComponent {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {

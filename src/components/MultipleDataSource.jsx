@@ -3,14 +3,13 @@ import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
-import Component from './Component';
+import BaseComponent from './BaseComponent';
 import { Row, Col, Input, Button, Icon, Select, Card } from 'antd';
 import MultipleItem from './MultipleItem';
 
 const Option = Select.Option;
 
-
-@observer class MultipleDataSource extends Component {
+@observer class MultipleDataSource extends BaseComponent {
     @observable hide = 'none'
     
     onAddData() {

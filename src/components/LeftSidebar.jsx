@@ -4,12 +4,13 @@ import { observer } from 'mobx-react';
 import get from 'lodash/get';
 import { Link } from 'react-router-dom'
 import { Layout, Menu } from 'antd';
-import Component from './Component';
+import BaseComponent from './BaseComponent';
+import MenuItem from 'antd/lib/menu/MenuItem';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-@observer class LeftSidebar extends Component {
+@observer class LeftSidebar extends BaseComponent {
     singledataNames = ['db', 'weblogic', 'tuxedo', '业务', '系统']
 
     componentWillMount() {
@@ -32,7 +33,10 @@ const { SubMenu } = Menu;
                     <span>大数据智能运维平台</span>
                 </div>
                 <Menu mode="inline" theme="dark">
-                    <SubMenu key="top" title="Analyze">
+                    <SubMenu key="top" title="系统拓扑">
+                        <Menu.Item key="topology" className="topology">拓扑分析</Menu.Item>
+                    </SubMenu>
+                    <SubMenu key="top" title="数据分析">
                         <Menu.Item key="1" className="searchManage">查询</Menu.Item>
                         <SubMenu key="sub1" title={<span>系统查询</span>}>
                             {this.appStore.multipleDataNames.map((item, key) => {
