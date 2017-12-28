@@ -1,12 +1,12 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
 import { Tabs, Card } from 'antd';
-import Component from './Component';
+import BaseComponent from './BaseComponent';
 import SearchPanel from './SearchPanel';
 
 const TabPane = Tabs.TabPane;
 
-class OperationPanel extends Component {
+class OperationPanel extends BaseComponent {
 
   @action.bound onTabChange(key) {
 

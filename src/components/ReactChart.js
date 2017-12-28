@@ -1,5 +1,5 @@
 import React from 'react';
-import Component from './Component';
+import BaseComponent from './BaseComponent';
 
 //数据结构
 var data = [
@@ -9,7 +9,7 @@ var data = [
     {title: '数据库', data:[[0, 83], [1, 34], [2, 77], [3, 20], [4, 67], [5, 12], [6, 4], [7, 63], [8, 88], [9, 19], [10, 83], [11, 34]]}
 ]
 
-class ReactChart extends Component {
+class ReactChart extends BaseComponent {
     constructor(props, context) {
         super(props, context);
         this.charts = [];

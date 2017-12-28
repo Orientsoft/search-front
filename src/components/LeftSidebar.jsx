@@ -4,12 +4,12 @@ import { observer } from 'mobx-react';
 import get from 'lodash/get';
 import { Link } from 'react-router-dom'
 import { Layout, Menu } from 'antd';
-import Component from './Component';
+import BaseComponent from './BaseComponent';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-@observer class LeftSidebar extends Component {
+@observer class LeftSidebar extends BaseComponent {
     singledataNames = ['db', 'weblogic', 'tuxedo', '业务', '系统']
 
     componentWillMount() {

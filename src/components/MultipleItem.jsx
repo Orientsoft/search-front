@@ -3,12 +3,12 @@ import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
 import { Row, Col, Select, Input, Button, Modal } from 'antd';
 import get from 'lodash/get';
-import Component from './Component';
+import BaseComponent from './BaseComponent';
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
 
-@observer class DataSourceItem extends Component {
+@observer class DataSourceItem extends BaseComponent {
 
     @observable.ref fields = []
     @observable dataSources = []

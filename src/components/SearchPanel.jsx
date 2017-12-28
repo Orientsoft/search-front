@@ -3,7 +3,7 @@ import { Row, Col, Form, Checkbox, Button, Select, DatePicker } from 'antd';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import * as moment from 'moment';
-import Component from './Component';
+import BaseComponent from './BaseComponent';
 import fieldFilter from '../queries/filters/datetime/field';
 
 const FormItem = Form.Item;
@@ -19,7 +19,7 @@ const formItemLayout = {
     }
 };
 
-@observer class SearchPanel extends Component {
+@observer class SearchPanel extends BaseComponent {
     // 时间粒度
     timeSize = 'minute';
     // 时间格式，'x'表示Unix毫秒时间戳
