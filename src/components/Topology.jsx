@@ -1,5 +1,5 @@
 import React from 'react';
-import Vizceral from './Vizceral';
+import Vizceral from '../libs/Vizceral';
 import BaseComponent from './BaseComponent';
 
 class Topology extends BaseComponent {
