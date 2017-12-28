@@ -4,13 +4,13 @@ import { observer } from 'mobx-react';
 import { Row, Col, Select, Input, Button, Modal } from 'antd';
 import get from 'lodash/get';
 import BaseComponent from './BaseComponent';
-
+import getFields from  '../utils/fields';
 const Option = Select.Option;
 const confirm = Modal.confirm;
 
 
 @observer class DataSourceItem extends BaseComponent {
-
+//select option
     @observable.ref types = ['db', 'weblogic', 'tuxedo', '业务', '系统']
     @observable.ref fields = []
     @observable.ref indices = []
@@ -47,33 +47,15 @@ const confirm = Modal.confirm;
         this.elastic.getIndices(index).then(action(result => {
             const mappings = get(result, [index, 'mappings'], {});
             const type = Object.keys(mappings)[0];
-            let fields = Object.keys(mappings[type].properties);
-            console.log("fields", mappings[type].properties.message.properties)
-            let finalFields = []
-            for (let key in fields) {
-                if (fields[key] == 'message') {
-                    let messageFields = Object.keys(mappings[type].properties.message.properties)
-                    messageFields.map((item) => {
-                        
-                        // if(item.hasOwnProperty('properties')){
-                        //     console.log('dddd')
-                        //     let ffff = Object.keys(messageFields[item])
-                        //     for(let key in ffff){
-                        //         let item = "message." + item + '.'+ ffff[key]
-                        //         finalFields.push(item)
-                        //     }
-                        // }
-                        item = "message." + item
-                        finalFields.push(item)
-                    })
-                } else if (fields[key] == '@timestamp') {
-                    this.time.push(fields[key])
-                } else {
-                    finalFields.push(fields[key])
+            
+            this.fields = getFields(mappings[type]);
+            for(let key in  this.fields){
+                if(this.fields[key] == "@timestamp"){
+                    this.time.push(this.fields[key])
                 }
             }
-            this.fields = finalFields
-        }))
+            console.log(' this.fields', this.fields);
+        }));
     }
 
     onTypeChange(type) {
