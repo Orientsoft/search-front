@@ -5,7 +5,6 @@ import get from 'lodash/get';
 import { Link } from 'react-router-dom'
 import { Layout, Menu } from 'antd';
 import BaseComponent from './BaseComponent';
-import MenuItem from 'antd/lib/menu/MenuItem';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -22,7 +21,6 @@ const { SubMenu } = Menu;
     }
     onMenuChange (e,key){
        this.appStore.singleDataType = e
-       console.log('dataname',this.appStore.singleDataType)
     }
     
 
