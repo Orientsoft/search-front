@@ -4,37 +4,38 @@ import { observer } from 'mobx-react';
 import { Row, Col, Select, Input, Button, Modal } from 'antd';
 import get from 'lodash/get';
 import BaseComponent from './BaseComponent';
-
+import getFields from  '../utils/fields';
 const Option = Select.Option;
 const confirm = Modal.confirm;
 
-@observer class DataSourceItem extends BaseComponent {
 
+@observer class DataSourceItem extends BaseComponent {
+//select option
     @observable.ref types = ['db', 'weblogic', 'tuxedo', '业务', '系统']
     @observable.ref fields = []
     @observable.ref indices = []
+    @observable.ref time = []
     @observable dataSource = []
     @observable enableEdit = []
-
+    //select 显示的value
     @observable keys = []
     @observable originname = ''
     @observable category = ''
     @observable index = ''
+    @observable ts = ''
 
 
     // 需要提交保存的数据
-    data = {category:'',index:'',fields:[],name:''}
+    data = { category: '', index: '', fields: [], name: '', time: [] }
     name = ''
 
     constructor(props) {
         super(props)
-
     }
 
     componentWillMount() {
         this.elastic.getSingleDataSource().then(result => {
             this.dataSource = get(result, 'hits.hits', []).map(data => data._source);
-            // this.appStore.singleDatas =  this.dataSource
             this.enableEdit = Array(this.dataSource.length);
         });
         this.elastic.catIndices().then(action(indices => {
@@ -42,6 +43,20 @@ const confirm = Modal.confirm;
         }));
     }
 
+    getAllKeys(index) {
+        this.elastic.getIndices(index).then(action(result => {
+            const mappings = get(result, [index, 'mappings'], {});
+            const type = Object.keys(mappings)[0];
+            
+            this.fields = getFields(mappings[type]);
+            for(let key in  this.fields){
+                if(this.fields[key] == "@timestamp"){
+                    this.time.push(this.fields[key])
+                }
+            }
+            console.log(' this.fields', this.fields);
+        }));
+    }
 
     onTypeChange(type) {
         this.data.category = type;
@@ -50,16 +65,17 @@ const confirm = Modal.confirm;
 
     onIndexChange(index) {
         this.data.index = index;
+        this.fields = []
+        this.time = []
+        this.ts = []
+        this.keys = []
         this.index = index;
-        this.elastic.getIndices(index).then(action(result => {
-            const mappings = get(result, [index, 'mappings'], {});
-            const type = Object.keys(mappings)[0];
+        this.getAllKeys(index)
+    }
 
-            if (type) {
-                this.data.type = type;
-                this.fields = Object.keys(mappings[type].properties);
-            }
-        }))
+    onTimeChange(value) {
+        this.data.time = value;
+        this.ts = value;
     }
 
     onKeyChange(value) {
@@ -78,49 +94,33 @@ const confirm = Modal.confirm;
 
     onEditIndex(index) {
         this.data.index = index;
-        console.log('index', index)
-        this.elastic.getIndices(index).then(action(result => {
-            const mappings = get(result, [index, 'mappings'], {});
-            const type = Object.keys(mappings)[0];
+        this.getAllKeys(index)
+    }
 
-            if (type) {
-                this.data.type = type;
-                this.fields = Object.keys(mappings[type].properties);
-            }
-        }))
+    onEditTime(value) {
+        this.getAllKeys(this.data.index)
+        this.data.time = value;
     }
 
     onEditKey(value) {
-        this.elastic.getIndices(this.data.index).then(action(result => {
-            const mappings = get(result, [this.data.index, 'mappings'], {});
-            const type = Object.keys(mappings)[0];
-
-            if (type) {
-                this.data.type = type;
-                this.fields = Object.keys(mappings[type].properties);
-            }
-        }))
+        this.getAllKeys(this.data.index)
         this.data.fields = value;
     }
 
     onSave() {
-        // if ((this.data.category = '') || (this.data.index = '') || (this.data.name = '') || (this.data.fields = [])){
-        //     alert(' all values are required !')
-        // } else {
-            
-        // }
         this.elastic.saveSingleDataSource(this.data.name, this.data);
-            this.dataSource.push(this.data);
-            // this.appStore.singleDatas.push(this.data)
+        this.dataSource.push(this.data);
 
-            this.enableEdit.push(false);
-            this.fields = []
-            // this.data = {}
+        this.enableEdit.push(false);
+        this.fields = []
+        this.time = []
+        this.data = {}
 
-            this.keys = []
-            this.category = ''
-            this.index = ''
-            this.originname = ''
+        this.keys = []
+        this.category = ''
+        this.index = ''
+        this.ts = ''
+        this.originname = ''
 
     }
 
@@ -137,6 +137,9 @@ const confirm = Modal.confirm;
         // this.data = {}
 
         this.enableEdit[key] = false;
+        this.fields = []
+        this.time = []
+        this.data = {}
     }
 
     render() {
@@ -144,14 +147,15 @@ const confirm = Modal.confirm;
             <div>
                 <div className='contentManager'>
                     <Row gutter={16}>
-                        <Col span={3} className="gutter-row">类型:</Col>
+                        <Col span={2} className="gutter-row">类型:</Col>
                         <Col span={3} className="gutter-row">数据源:</Col>
-                        <Col span={9} className="gutter-row">字段选择:</Col>
-                        <Col span={5} className="gutter-row">名称:</Col>
+                        <Col span={3} className="gutter-row">时间:</Col>
+                        <Col span={8} className="gutter-row">字段选择:</Col>
+                        <Col span={3} className="gutter-row">名称:</Col>
                     </Row>
 
                     <Row gutter={16} style={{ display: this.props.add }}>
-                        <Col span={3} className="gutter-row">
+                        <Col span={2} className="gutter-row">
                             <Select style={{ width: '100%' }} value={this.category} onChange={(value) => this.onTypeChange(value)}>
                                 {
                                     this.types && this.types.map((type, key) => {
@@ -169,7 +173,17 @@ const confirm = Modal.confirm;
                                 }
                             </Select>
                         </Col>
-                        <Col span={9} className="gutter-row">
+                        <Col span={3} className="gutter-row">
+                            <Select style={{ width: '100%' }} value={this.ts} onChange={(value) => this.onTimeChange(value)}>
+                                {
+                                    this.time && this.time.map((index, key) => {
+                                        return <Option value={index} key={key}>{index}</Option>
+                                    })
+                                }
+                            </Select>
+                        </Col>
+
+                        <Col span={8} className="gutter-row">
                             <Select
                                 mode="tags"
                                 placeholder="Please select"
@@ -184,7 +198,7 @@ const confirm = Modal.confirm;
                                 }
                             </Select>
                         </Col>
-                        <Col span={4} className="gutter-row">
+                        <Col span={3} className="gutter-row">
                             <Input onChange={(e) => this.onNameChange(e.target.value)} value={this.originname} />
                         </Col>
                         <Col span={5} className="gutter-row">
@@ -195,22 +209,30 @@ const confirm = Modal.confirm;
 
                 <div className='contentManager'>
                     {this.dataSource.map((item, key) => {
+                        
                         return (<Row gutter={16} key={key}>
-                            <Col span={3} className="gutter-row">
+                            <Col span={2} className="gutter-row">
                                 <Select value={item.category} style={{ width: '100%' }} disabled={!this.enableEdit[key]} onChange={(value) => this.onEditType(value)}>
-                                    {this.types && this.types.map((item, key) => {
+                                    {this.types.slice() && this.types.slice().map((item, key) => {
                                         return <Option value={item} key={key}>{item}</Option>
                                     })}
                                 </Select>
                             </Col>
                             <Col span={3} className="gutter-row">
                                 <Select value={item.index} style={{ width: '100%' }} disabled={!this.enableEdit[key]} onChange={(value) => this.onEditIndex(value)}>
-                                    {this.indices && this.indices.map((item, key) => {
+                                    {this.indices.slice() && this.indices.slice().map((item, key) => {
                                         return <Option value={item} key={key}>{item}</Option>
                                     })}
                                 </Select>
                             </Col>
-                            <Col span={9} className="gutter-row">
+                            <Col span={3} className="gutter-row">
+                                <Select style={{ width: '100%' }} value={item.time} disabled={!this.enableEdit[key]} onChange={(value) => this.onEditTime(value)}>
+                                    {this.time.slice() && this.time.slice().map((item, key) => {
+                                        return <Option value={item} key={key}>{item}</Option>
+                                    })}
+                                </Select>
+                            </Col>
+                            <Col span={8} className="gutter-row">
                                 <Select
                                     mode="tags"
                                     placeholder="Please select"
@@ -219,12 +241,12 @@ const confirm = Modal.confirm;
                                     onChange={(value) => this.onEditKey(value)}
                                     disabled={!this.enableEdit[key]}
                                 >
-                                    {this.fields && this.fields.map((field, key) => {
+                                    {this.fields.slice() && this.fields.slice().map((field, key) => {
                                         return <Option value={field} key={key}>{field}</Option>
                                     })}
                                 </Select>
                             </Col>
-                            <Col span={4} className="gutter-row">
+                            <Col span={3} className="gutter-row">
                                 <Input value={item.name} disabled />
                             </Col>
                             <Col span={5} className="gutter-row">
@@ -274,3 +296,6 @@ const confirm = Modal.confirm;
 }
 
 export default DataSourceItem;
+
+
+

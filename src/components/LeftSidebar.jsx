@@ -48,11 +48,7 @@ const { SubMenu } = Menu;
                         <Menu.Item key="historySearch"><Link to="/historySearch">历史查询记录</Link></Menu.Item>
                         <Menu.Item key="2" className="searchManage">管理</Menu.Item>
                         <Menu.Item key="singledata"><Link to="/singledata">数据源配置</Link></Menu.Item>
-                        <SubMenu key="sub2" title={<span>指标配置</span>}>
-                            {/* {this.singledataNames.map((item, key) => {
-                                return (<Menu.Item key={key}><Link to="/singledataSearch" key={key} onClick={(e,key) => this.onMenuChange(item,key)}>{item}</Link></Menu.Item>)
-                            })} */}
-                        </SubMenu>
+                        <Menu.Item key="metric"><Link to="/metric">指标配置</Link></Menu.Item>
                         <Menu.Item key="multipledata"><Link to="/multipledata">系统配置</Link></Menu.Item>
                     </SubMenu>
                 </Menu>
