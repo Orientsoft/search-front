@@ -32,22 +32,59 @@ class Topology extends BaseComponent {
                 visible: -1
             },
             trafficData: {
-                name: 'us-west-2',
-                renderer: 'global',
-                maxVolume: 500,
-                nodes: [
-                  {name: 'INTERNET'},
-                  {name: 'service'}
-                ],
-                connections: [
+                "renderer": "global",
+                "name": "edge",
+                "nodes": [
                   {
-                    source: 'INTERNET',
-                    target: 'service',
-                    metrics: { normal: 100, warning: 95, danger: 5 },
-                    metadata: { streaming: true }
+                    "renderer": "region",
+                    "name": "INTERNET",
+                    "class": "normal"
+                  },
+                  {
+                    "renderer": "region",
+                    "name": "核心系统",
+                    "maxVolume": 50000,
+                    "class": "normal",
+                    "updated": 1466838546805,
+                    "nodes": [
+                      {
+                        "name": "INTERNET",
+                        "renderer": "focusedChild",
+                        "class": "normal"
+                      },
+                      {
+                        "name": "proxy-prod",
+                        "renderer": "focusedChild",
+                        "class": "normal"
+                      }
+                    ],
+                    "connections": [
+                      {
+                        "source": "INTERNET",
+                        "target": "proxy-prod",
+                        "metrics": {
+                          "danger": 116.524,
+                          "normal": 15598.906
+                        },
+                        "class": "normal"
+                      }
+                    ]
+                  }
+                ],
+                "connections": [
+                  {
+                    "source": "INTERNET",
+                    "target": "核心系统",
+                    "metrics": {
+                      "normal": 26037.626,
+                      "danger": 1192.37
+                    },
+                    "notices": [
+                    ],
+                    "class": "normal"
                   }
                 ]
-            },
+              },
             regionUpdateStatus: [],
             timeOffset: 0,
             modes: {
