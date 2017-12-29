@@ -4,189 +4,91 @@ import { observer } from 'mobx-react';
 import { Row, Col, Select, Input, Button, Modal } from 'antd';
 import get from 'lodash/get';
 import BaseComponent from './BaseComponent';
-import getFields from '../utils/fields';
+
 const Option = Select.Option;
 const confirm = Modal.confirm;
 
-
 @observer class MetricContent extends BaseComponent {
-    //select option
-    @observable.ref types = ['db', 'weblogic', 'tuxedo', '业务', '系统']
-    @observable.ref fields = []
-    @observable.ref indices = []
-    @observable.ref time = []
-    @observable dataSource = []
-    @observable enableEdit = []
-    //select 显示的value
-    @observable keys = []
-    @observable originname = ''
-    @observable category = ''
-    @observable index = ''
-    @observable ts = ''
-
-
-    // 需要提交保存的数据
-    data = { category: '', index: '', fields: [], name: '', time: [] }
-    name = ''
-
-    constructor(props) {
-        super(props)
-    }
+    // 当前指标绑定的数据源
+    @observable.ref source = null;
 
     componentWillMount() {
         this.elastic.getSingleDataSource().then(result => {
-            this.dataSource = get(result, 'hits.hits', []).map(data => data._source);
-            this.enableEdit = Array(this.dataSource.length);
+            this.setState({
+                sources: this.getHits(result).map(data => data._source)
+            });
         });
-        this.elastic.catIndices().then(action(indices => {
-            this.indices = indices.map((index) => index.index);
-        }));
     }
 
-    getAllKeys(index) {
-        this.elastic.getIndices(index).then(action(result => {
-            const mappings = get(result, [index, 'mappings'], {});
-            const type = Object.keys(mappings)[0];
-
-            this.fields = getFields(mappings[type]);
-            for (let key in this.fields) {
-                if (this.fields[key] == "@timestamp") {
-                    this.time.push(this.fields[key])
-                }
-            }
-            console.log(' this.fields', this.fields);
-        }));
-    }
-
-    onTypeChange(type) {
-        this.data.category = type;
-        this.category = type
-    }
-
-    onIndexChange(index) {
-        this.data.index = index;
-        this.fields = []
-        this.time = []
-        this.ts = []
-        this.keys = []
-        this.index = index;
-        this.getAllKeys(index)
-    }
-
-    onTimeChange(value) {
-        this.data.time = value;
-        this.ts = value;
-    }
-
-    onKeyChange(value) {
-        this.data.fields = value;
-        this.keys = value;
-    }
-
-    onNameChange(value) {
-        this.data.name = value;
-        this.originname = value;
-    }
-
-    onEditType(type) {
-        this.data.category = type;
-    }
-
-    onEditIndex(index) {
-        this.data.index = index;
-        this.getAllKeys(index)
-    }
-
-    onEditTime(value) {
-        this.getAllKeys(this.data.index)
-        this.data.time = value;
-    }
-
-    onEditKey(value) {
-        this.getAllKeys(this.data.index)
-        this.data.fields = value;
-    }
-
-    onSave() {
-        this.elastic.saveSingleDataSource(this.data.name, this.data);
-        this.dataSource.push(this.data);
-
-        this.enableEdit.push(false);
-        this.fields = []
-        this.time = []
-        this.data = {}
-
-        this.keys = []
-        this.category = ''
-        this.index = ''
-        this.ts = ''
-        this.originname = ''
-
-    }
-
-    onSaveChange(key, name) {
-        console.log("this.data", this.data)
-        this.elastic.updateSingleDataSource(this.data.name, this.data);
-        // for(let i=0; i< this.dataSource.length;i++){
-        //     if(this.dataSource[i].name == name){
-        //         // this.dataSource[i] = this.data
-        //         this.appStore.singleDatas[i] = this.data
-        //     }
-        // }
-        // this.dataSource.push(this.data);
-        // this.data = {}
-
-        this.enableEdit[key] = false;
-        this.fields = []
-        this.time = []
-        this.data = {}
+    /**
+     * 数据源更新回调函数
+     * @param {Number} key - 数据源索引
+     */
+    @action.bound onSourceChanged(key) {
+        this.source = this.state.sources[key];
     }
 
     render() {
+        const { sources = [] } = this.state;
+        console.log('fields:', get(this.source, 'fields', []));
+
         return (
             <div>
-                <div>
-                    
-                </div>
+                <h3>指标选项</h3>
+                <Row type="flex" align="middle">
+                    <Col span={2}>数据源：</Col>
+                    <Col span={22}>
+                        <Select style={{ width: '100%' }} onChange={this.onSourceChanged}>
+                        {sources.map((source, key) => <Option key={key} value={key}>{source.name}</Option>)}
+                        </Select>
+                    </Col>
+                </Row>
+                {get(this.source, 'fields', []).map((field, key) => (
+                    <Row key={key}>
+                        <Col span={2}>字段：</Col>
+                        <Col span={6}>
+                            <Select value={field} disabled style={{ width: '100%' }} />
+                        </Col>
+                        <Col span={2}>名字：</Col>
+                        <Col span={6}><Input /></Col>
+                        <Col span={2}>值：</Col>
+                        <Col span={6}><Input /></Col>
+                    </Row>
+                ))}
+                <h3>图表选项</h3>
+                <Row type="flex" align="middle">
+                    <Col span={2}>类型：</Col>
+                    <Col span={22}>
+                        <Select defaultValue="bar" style={{ width: '100%' }}>
+                            <Option value="bar">柱状图</Option>
+                            <Option value="line">折线图</Option>
+                        </Select>
+                    </Col>
+                </Row>
+                <Row type="flex" align="middle">
+                    <Col span={2}>标题：</Col>
+                    <Col span={22}><Input /></Col>
+                </Row>
+                <Row type="flex" align="middle">
+                    <Col span={2}>X轴：</Col>
+                    <Col span={10}><Select style={{ width: '100%' }} value={get(this.source, 'time', '@timestamp')} disabled /></Col>
+                    <Col span={2}>标题</Col>
+                    <Col span={10}><Input defaultValue="时间" /></Col>
+                </Row>
+                <Row type="flex" align="middle">
+                    <Col span={2}>Y轴：</Col>
+                    <Col span={10}><Select style={{ width: '100%' }} /></Col>
+                    <Col span={2}>标题：</Col>
+                    <Col span={10}><Input /></Col>
+                </Row>
+                <Row type="flex" justify="center">
+                    <Col span={4}>
+                        <Button type="primary" style={{ width: '100%' }}>保存</Button>
+                    </Col>
+                </Row>
             </div>
         );
-    }
-
-    @action.bound onItemSave(data) {
-        this.dataSource.push(data);
-        this.enableEdit.push(false);
-    }
-
-    @action onDeleteSource(key) {
-        const source = this.dataSource.splice(key, 1)[0];
-        this.appStore.singleDatas = this.dataSource
-        this.enableEdit[key] = false;
-        this.elastic.deleteSingleDataSource(source.name);
-    }
-
-    @action onEditSource(key, name) {
-        let that = this
-        this.name = name
-        for (var i = 0; i < this.dataSource.length; i++) {
-            if (name == this.dataSource[i].name) {
-                this.data = this.dataSource[i]
-            }
-        }
-        confirm({
-            title: 'edit',
-            content: 'Are you sure to edit ' + name + ' ?',
-            onOk() {
-                that.enableEdit[key] = true;
-            },
-            onCancel() {
-                console.log('Cancel');
-            },
-        })
-        // this.enableEdit[key] = true;
     }
 }
 
 export default MetricContent;
-
-
-
