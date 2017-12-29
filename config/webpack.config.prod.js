@@ -6,7 +6,6 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const BundleBuddyWebpackPlugin = require("bundle-buddy-webpack-plugin");
 const ManifestPlugin = require('webpack-manifest-plugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 const paths = require('./paths');
@@ -393,16 +392,7 @@ let config = {
 };
 
 if(process.env.ANALYZE) {
-    config.plugins.push(
-        // generate bundle reports
-        new BundleAnalyzerPlugin()
-    )
-}
-
-if(process.env.BUNDLE_BUDDY) {
-    config.plugins.push(
-        new BundleBuddyWebpackPlugin({sam: true})
-    )
+    config.plugins.push(new BundleAnalyzerPlugin())
 }
 
 module.exports = config;
