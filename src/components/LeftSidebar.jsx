@@ -26,7 +26,7 @@ const { SubMenu } = Menu;
 
     render() {
         return (
-            <Sider style={{ overflow: 'auto', minHeight: '100vh' }}>
+            <Sider style={{ overflow: 'auto', minHeight: '100vh', position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 9 }}>
                 <div className="logo">
                     <span>大数据智能运维平台</span>
                 </div>

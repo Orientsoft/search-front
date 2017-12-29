@@ -35,7 +35,7 @@ class App extends React.Component {
             <Router>
                 <Layout>
                     <LeftSidebar />
-                    <Layout>
+                    <Layout style={{ paddingLeft: 200, minHeight: '100vh' }}>
                         <Route exact path="/" component={Index} />
                         <Route path="/core" component={Workspace}></Route>
                         <Route path="/metric" component={MetricSettings}></Route>
