@@ -4,12 +4,12 @@ import { observer } from 'mobx-react';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import { Row, Col, Input, Button, Icon, Select, Card } from 'antd';
-import BaseComponent from './BaseComponent';
+import BaseComponent from '../BaseComponent';
 import DataSourceItem from './DataSourceItem';
 
 const Option = Select.Option;
 
-@observer class SingleDataSource extends BaseComponent {
+@observer class SourceSettings extends BaseComponent {
     @observable hide = 'none'
     
     onAddData() {
@@ -27,4 +27,4 @@ const Option = Select.Option;
     }
 }
 
-export default SingleDataSource;
+export default SourceSettings;

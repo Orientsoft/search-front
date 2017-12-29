@@ -1,7 +1,7 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
 import { Tabs, Card } from 'antd';
-import BaseComponent from './BaseComponent';
+import BaseComponent from '../BaseComponent';
 import SearchPanel from './SearchPanel';
 
 const TabPane = Tabs.TabPane;

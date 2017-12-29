@@ -3,7 +3,7 @@ import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
 import { Row, Col, Select, Input, Button, Modal } from 'antd';
 import get from 'lodash/get';
-import BaseComponent from './BaseComponent';
+import BaseComponent from '../BaseComponent';
 
 const Option = Select.Option;
 const confirm = Modal.confirm;

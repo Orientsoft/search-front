@@ -1,6 +1,6 @@
 import React from 'react';
 import { Breadcrumb as AntBreadcrumb } from 'antd';
-import BaseComponent from './BaseComponent';
+import BaseComponent from '../BaseComponent';
 
 const { Item } = AntBreadcrumb;
 
