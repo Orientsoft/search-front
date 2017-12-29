@@ -42,7 +42,7 @@ class Topology extends BaseComponent {
                   },
                   {
                     "renderer": "region",
-                    "name": "us-east-1",
+                    "name": "核心系统",
                     "maxVolume": 50000,
                     "class": "normal",
                     "updated": 1466838546805,
@@ -74,10 +74,10 @@ class Topology extends BaseComponent {
                 "connections": [
                   {
                     "source": "INTERNET",
-                    "target": "us-east-1",
+                    "target": "核心系统",
                     "metrics": {
                       "normal": 26037.626,
-                      "danger": 92.37
+                      "danger": 1192.37
                     },
                     "notices": [
                     ],
