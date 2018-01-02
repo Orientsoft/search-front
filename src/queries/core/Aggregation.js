@@ -58,8 +58,10 @@ class Aggregation {
  * @param {String} name - 聚合名称
  * @return {Function} 聚合构造函数
  */
-export function defineAggregation(name) {
-    return initialAgg => new Aggregation(name, initialAgg);
+export function defineAggregation(agg) {
+    return (name, initialAgg) => new Aggregation(name, {
+        [agg]: initialAgg
+    });
 }
 
 export default Aggregation;

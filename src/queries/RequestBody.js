@@ -132,6 +132,8 @@ class RequestBody {
                     return merge(body, { query: query.toJSON() });
                 } else if (query instanceof Aggregation) {
                     return merge(body, { aggs: query.toJSON() });
+                } else if (query instanceof RequestBody) {
+                    return merge(body, query.toJSON().body);
                 }
 
                 return merge(body, query);
