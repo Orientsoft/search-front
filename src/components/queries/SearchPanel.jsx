@@ -135,7 +135,7 @@ const formItemLayout = {
             <div>
                 <Row type="flex" justify="space-between" align="middle" gutter={24}>
                     <Col span={22}>
-                        <div ref={el => this.onInitDateTimeSlider(el)} />
+                        <input ref={el => this.onInitDateTimeSlider(el)} />
                     </Col>
                     <Col span={2}>
                         <Button size="large" type="primary" onClick={() => this.onSearch()}>搜索</Button>
