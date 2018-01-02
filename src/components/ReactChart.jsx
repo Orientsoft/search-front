@@ -1,55 +1,82 @@
 import React from 'react';
 import BaseComponent from './BaseComponent';
+import { observer } from 'mobx-react';
+import { computed } from 'mobx';
+import * as moment from 'moment';
+// import Item from '_antd@3.0.3@antd/lib/list/Item';
 
 // 数据结构
-const data = [
-    { title: 'DB', data: [[1, 64], [2, 54], [3, 12], [4, 33], [5, 93], [6, 34], [7, 14], [8, 43], [9, 94], [10, 63], [11, 88]] },
-    { title: 'tploader', data: [[1, 14], [2, 43], [3, 94], [4, 63], [5, 88], [6, 19], [7, 83], [8, 34], [9, 77], [10, 20], [11, 67]] },
-    { title: '中间件', data: [[1, 84], [2, 96], [3, 75], [4, 23], [5, 64], [6, 6], [7, 73], [8, 64], [9, 54], [10, 12], [11, 33]] },
-    { title: '数据库', data: [[1, 34], [2, 77], [3, 20], [4, 67], [5, 12], [6, 4], [7, 63], [8, 88], [9, 19], [10, 83], [11, 34]] }
-]
+// const data = [
+//     { title: 'DB', data: [[1, 64], [2, 54], [3, 12], [4, 33], [5, 93], [6, 34], [7, 14], [8, 43], [9, 94], [10, 63], [11, 88]] },
+//     { title: 'tploader', data: [[1, 14], [2, 43], [3, 94], [4, 63], [5, 88], [6, 19], [7, 83], [8, 34], [9, 77], [10, 20], [11, 67]] },
+//     { title: '中间件', data: [[1, 84], [2, 96], [3, 75], [4, 23], [5, 64], [6, 6], [7, 73], [8, 64], [9, 54], [10, 12], [11, 33]] },
+//     { title: '数据库', data: [[1, 34], [2, 77], [3, 20], [4, 67], [5, 12], [6, 4], [7, 63], [8, 88], [9, 19], [10, 83], [11, 34]] }
+// ]
 
-class ReactChart extends BaseComponent {
+const chartConfig = [
+    {name: '手机', fileds: {}, type: 'line', title: '中间件', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)',Xtitle: '时间' },
+    {name: '手机', fileds: {}, type: 'histogram', title: 'tploader', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)',Xtitle: '时间' },
+    {name: '手机', fileds: {}, type: 'line', title: 'DB', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)',Xtitle: '时间' },
+]
+@observer class ReactChart extends BaseComponent {
     constructor(props, context) {
         super(props, context);
         this.charts = [];
         this.state = {
-            data: []
+            // data: [], 
+            chartConfig: []
         }
         this.barChartPlotter = this.barChartPlotter.bind(this);
         this.darkenColor = this.darkenColor.bind(this);
     }
+    @computed get data() {
+        const buckets = this.getBuckets('osUser');
+
+        return buckets.map(bucket => {
+            const date = moment(bucket.key).unix();
+            return [new Date(date), bucket.doc_count];
+        });
+    }
+
 
     render() {
         return (
             <div className="clearfix">
-                {this.state.data.length > 0 && this.state.data.map((item, key) => (
+                {
+                    this.state.chartConfig.length > 0 && this.state.chartConfig.map((item, key)=>(
+                        <div key={key} className="chart">
+                            <div key={key} ref={el => this.initChart(el, key, this.data, item)}></div>
+                        </div>
+                    ))
+                }
+                {/* {this.state.data.length > 0 && this.state.data.map((item, key) => (
                     <div key={key} className="chart">
                         <div key={key} ref={el => this.initChart(el, key, item.data, item.title)} ></div>
                     </div>
-                ))}
+                ))} */}
             </div>
         );
     }
     componentDidUpdate() {
         var sync = Dygraph.synchronize(this.charts);
     }
-    initChart(el, key, data, title) {
+    initChart(el, key, data, chartConfig) {
         var chart = this.charts[key];
         if (!chart) {
-            if (key % 2 == 0){
+            if (chartConfig.type == 'histogram') {
                 chart = new Dygraph(el, data, {
                     labels: ['x', '数量'],
                     drawGrid: false,
-                    title: title,
+                    title: chartConfig.title,
                     height: 200,
                     colors: ['#CC3333'],
                     fillGraph: true,
-                    xRangePad: 1,
+                    // xRangePad: 50,
                     highlightCircleSize: 6,
                     axisLineWidth: 1,
-                    ylabel: '数量 (万笔)',
-                    // strokeWidth: 2,
+                    ylabel: chartConfig.Ytitle,
+                    xlabel: chartConfig.Xtitle,
+                    strokeWidth: 2,
                     plotter: this.barChartPlotter,
                     plugins: [
                         new Dygraph.Plugins.Crosshair({
@@ -57,22 +84,23 @@ class ReactChart extends BaseComponent {
                         })
                     ]
                 })
-                
-            }else {
+
+            } else if (chartConfig.type == 'line'){
                 chart = new Dygraph(el, data, {
                     labels: ['x', '数量'],
                     drawGrid: false,
-                    title: title,
+                    title: chartConfig.title,
                     height: 200,
                     colors: ['#CC3333'],
                     fillGraph: true,
-                    xRangePad: 1,
+                    // xRangePad: 50,
                     highlightCircleSize: 6,
                     axisLineWidth: 1,
-                    ylabel: '数量 (万笔)',
+                    ylabel: chartConfig.Ytitle,
+                    xlabel: chartConfig.Xtitle,
                     // drawAxesAtZero: true, 
                     // includeZero: true, 
-                    strokeWidth: 3,
+                    strokeWidth: 2,
                     // logscale: true, 
                     // labelsShowZeroValues: true, 
                     plugins: [
@@ -92,7 +120,7 @@ class ReactChart extends BaseComponent {
         color.g = Math.floor((255 + color.g) / 2);
         color.b = Math.floor((255 + color.b) / 2);
         return 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-      }
+    }
 
     barChartPlotter(e) {
         var ctx = e.drawingContext;
@@ -120,12 +148,16 @@ class ReactChart extends BaseComponent {
 
             ctx.strokeRect(center_x - bar_width / 2, p.canvasy,
                 bar_width, y_bottom - p.canvasy);
+
+
         }
+
     }
 
     componentDidMount() {
         this.setState({
-            data: data
+            // data: this.data, 
+            chartConfig: chartConfig
         })
     }
 
