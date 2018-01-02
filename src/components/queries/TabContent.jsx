@@ -4,8 +4,8 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import set from 'lodash/set';
 import forEach from 'lodash/forEach';
-import BaseComponent from './BaseComponent';
-import ReactChart from './ReactChart'
+import BaseComponent from '../BaseComponent';
+import ReactChart from '../ReactChart'
 
 const Panel = Collapse.Panel;
 const TabPane = Tabs.TabPane;

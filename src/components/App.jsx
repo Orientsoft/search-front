@@ -3,14 +3,14 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 import PropTypes from 'prop-types';
 import { Layout } from 'antd';
 import Index from './Index';
-import Workspace from './Workspace';
+import Workspace from './queries/Workspace';
 import LeftSidebar from './LeftSidebar';
-import MultipleDataSource from './MultipleDataSource';
-import SingleDataSource from './SingleDataSource';
-import SingleDataSearch from './SingleDataSearch';
+import SourceSettings from './manages/SourceSettings';
+import MetricSettings from './manages/MetricSettings';
+import SystemSettings from './manages/SystemSettings';
+import SingleDataSearch from './queries/SingleDataSearch';
 import Topology from './Topology';
 
-import MetricSetting from './MetricSetting';
 // import createBrowserHistory from 'history/createBrowserHistory'
 
 // const history = createBrowserHistory()
@@ -35,12 +35,12 @@ class App extends React.Component {
             <Router>
                 <Layout>
                     <LeftSidebar />
-                    <Layout>
+                    <Layout style={{ paddingLeft: 200, minHeight: '100vh' }}>
                         <Route exact path="/" component={Index} />
                         <Route path="/core" component={Workspace}></Route>
-                        <Route path="/metric" component={MetricSetting}></Route>
-                        <Route path="/singledata" component={SingleDataSource}></Route>
-                        <Route path="/multipledata" component={MultipleDataSource}></Route>
+                        <Route path="/metric" component={MetricSettings}></Route>
+                        <Route path="/singledata" component={SourceSettings}></Route>
+                        <Route path="/multipledata" component={SystemSettings}></Route>
                         <Route path="/topology" component={Topology}></Route>
                     </Layout>
                 </Layout>

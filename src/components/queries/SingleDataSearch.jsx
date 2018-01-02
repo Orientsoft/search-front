@@ -2,10 +2,11 @@ import React from 'react';
 import { observable, computed, action } from 'mobx';
 import { Tabs, Card } from 'antd';
 import get from 'lodash/get';
-import BaseComponent from './BaseComponent';
-import SingleDataContent from './SingleDataContent';
-import TabContent from './TabContent'
-import SearchPanel from './SearchPanel'
+import BaseComponent from '../BaseComponent';
+import SingleDataContent from '../manages/SourceContent';
+import TabContent from './TabContent';
+import SearchPanel from './SearchPanel';
+
 const TabPane = Tabs.TabPane;
 
 class SingleDataSearch extends BaseComponent {

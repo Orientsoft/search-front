@@ -3,8 +3,8 @@ import { Row, Col, Form, Checkbox, Button, Select, DatePicker } from 'antd';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import * as moment from 'moment';
-import BaseComponent from './BaseComponent';
-import fieldFilter from '../queries/filters/datetime/field';
+import BaseComponent from '../BaseComponent';
+import fieldFilter from '../../queries/filters/datetime/field';
 
 const FormItem = Form.Item;
 const { Option } = Select;
