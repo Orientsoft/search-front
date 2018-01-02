@@ -8,6 +8,7 @@ import LeftSidebar from './LeftSidebar';
 import SourceSettings from './manages/SourceSettings';
 import MetricSettings from './manages/MetricSettings';
 import SystemSettings from './manages/SystemSettings';
+import TopologySettings from './manages/TopologySettings';
 import SingleDataSearch from './queries/SingleDataSearch';
 import Topology from './Topology';
 
@@ -41,6 +42,7 @@ class App extends React.Component {
                         <Route path="/metric" component={MetricSettings}></Route>
                         <Route path="/singledata" component={SourceSettings}></Route>
                         <Route path="/multipledata" component={SystemSettings}></Route>
+                        <Route path="/topo" component={TopologySettings}></Route>
                         <Route path="/topology" component={Topology}></Route>
                     </Layout>
                 </Layout>

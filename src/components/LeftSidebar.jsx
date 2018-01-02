@@ -48,6 +48,7 @@ const { SubMenu } = Menu;
                         <Menu.Item key="singledata"><Link to="/singledata">数据源配置</Link></Menu.Item>
                         <Menu.Item key="metric"><Link to="/metric">指标配置</Link></Menu.Item>
                         <Menu.Item key="multipledata"><Link to="/multipledata">系统配置</Link></Menu.Item>
+                        <Menu.Item key="topo"><Link to="/topo">拓扑配置</Link></Menu.Item>
                     </SubMenu>
                 </Menu>
             </Sider>
