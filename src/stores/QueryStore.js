@@ -14,7 +14,7 @@ export class QueryStore {
             // 当前激活索引
             index: [],
             // 过滤字段
-            filterFields: ['osUser'],
+            filterFields: ['@timestamp'],
             // 日期格式
             momentFormat: 'YYYY-MM-DD HH:mm:ss',
             // 开始日期
