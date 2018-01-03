@@ -15,6 +15,15 @@ const FormItem = Form.Item;
     @observable.ref fields = [];
     @observable dataSource = [];
 
+    @observable name = '';
+    @observable originSource = '';
+    @observable chartType = '';
+    @observable chartTitle = '';
+    @observable yaxis = '';
+    @observable xTitle = '';
+    @observable YTitle = '';
+    xfields = {};
+
     // 需要提交保存的数据
     data = { name: '', source: '', fields: [], chart: { title: '', type: '', x: { field: '', label: '' }, y: { field: '', label: '' } } }
     name = ''
@@ -41,7 +50,7 @@ const FormItem = Form.Item;
                     let field = fields[j].field
                     let value = fields[j].value
                     let show = field + ' = ' + value
-                    allshow.push(show)  
+                    allshow.push(show)
                 }
                 this.dataSource[key].fieldShow = allshow
             }
@@ -106,7 +115,7 @@ const FormItem = Form.Item;
             data: JSON.stringify(this.data)
         });
         this.dataSource.push(this.data)
-       
+
         //设置显示的字段
         let length = this.dataSource.length - 1
         this.dataSource[length]['fieldShow'] = []
@@ -116,11 +125,11 @@ const FormItem = Form.Item;
             let field = fields[key].field
             let value = fields[key].value
             let show = field + ' = ' + value
-             allshow.push(show)
+            allshow.push(show)
         }
         this.dataSource[length].fieldShow = allshow
         this.props.setVisible(false);
-       
+
     }
     onCancel() {
         this.props.setVisible(false);
@@ -136,7 +145,7 @@ const FormItem = Form.Item;
     onEditSource(e) {
 
     }
-    @action onDeleteSource(key,name) {
+    @action onDeleteSource(key, name) {
         const source = this.dataSource.splice(key, 1)[0];
         // this.enableEdit[key] = false;
         this.elastic.deleteMetricDataSource(name);
@@ -285,7 +294,7 @@ const FormItem = Form.Item;
                             </Col>
                             <Col span={4} className="gutter-row">
                                 <Button onClick={() => this.onEditSource(key, item.name)} >编辑</Button>
-                                <Button onClick={() => this.onDeleteSource(key,item.name)}>删除</Button>
+                                <Button onClick={() => this.onDeleteSource(key, item.name)}>删除</Button>
                             </Col>
                         </Row>)
                     })}
