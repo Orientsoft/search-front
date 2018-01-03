@@ -12,9 +12,9 @@ const FormItem = Form.Item;
 @observer class MetricContent extends BaseComponent {
     // 当前指标绑定的数据源
     @observable.ref source = null;
-    @observable.ref fields = [];
     @observable dataSource = [];
 
+    @observable.ref fields = [];
     @observable name = '';
     @observable originSource = '';
     @observable chartType = '';
@@ -75,6 +75,7 @@ const FormItem = Form.Item;
      */
     @action.bound onSourceChanged(key) {
         this.fields = []
+        this.originSource = key
         this.source = this.state.sources[key];
         this.data.source = this.source.name
         let keys = get(this.source, 'fields', [])
@@ -83,6 +84,7 @@ const FormItem = Form.Item;
 
     onNameChange(e) {
         this.data.name = e;
+        this.name = e;
     }
 
     onfieldNameChange(e) {
@@ -94,20 +96,25 @@ const FormItem = Form.Item;
 
     onTypeChange(e) {
         this.data.chart.type = e;
+        this.chartType = e;
     }
 
     onTitleChange(e) {
         this.data.chart.title = e;
+        this.chartTitle = e;
     }
     onYaxisChange(e) {
         this.data.chart.y.field = e;
+        this.yaxis = e;
     }
     onTitleYChange(e) {
         this.data.chart.y.label = e;
+        this.YTitle = e;
     }
     onTitleXChange(e) {
         this.data.chart.x.label = e.target.value;
         this.data.chart.x.field = e.target.dataset.xaxis;
+        this.xTitle = e.target.value;
     }
 
     onSave(e) {
@@ -130,6 +137,16 @@ const FormItem = Form.Item;
         this.dataSource[length].fieldShow = allshow
         this.props.setVisible(false);
 
+        this.data = { name: '', source: '', fields: [], chart: { title: '', type: '', x: { field: '', label: '' }, y: { field: '', label: '' } } }
+        this.fields = [];
+        this.name = '';
+        this.originSource = '';
+        this.chartType = '';
+        this.chartTitle = '';
+        this.yaxis = '';
+        this.xTitle = '';
+        this.YTitle = '';
+
     }
     onCancel() {
         this.props.setVisible(false);
@@ -142,9 +159,20 @@ const FormItem = Form.Item;
             visibleEdit: false
         })
     }
-    onEditSource(e) {
 
+    onEditSource(key,name) {
+        this.setState({
+            visibleEdit: true
+        })
+        this.name = name
+        for (var i = 0; i < this.dataSource.length; i++) {
+            if (name == this.dataSource[i].name) {
+                this.data = this.dataSource[i]
+                console.log('this.data',this.data)
+            }
+        }
     }
+
     @action onDeleteSource(key, name) {
         const source = this.dataSource.splice(key, 1)[0];
         // this.enableEdit[key] = false;
@@ -164,10 +192,10 @@ const FormItem = Form.Item;
         let antdFormAdd = <Form horizonal='true'>
             <h4>指标选项</h4>
             <FormItem {...formItemLayout} label='指标名：'>
-                <Input onChange={(e) => this.onNameChange(e.target.value)} />
+                <Input onChange={(e) => this.onNameChange(e.target.value)} value={this.name} />
             </FormItem>
             <FormItem {...formItemLayout} label='数据源：'>
-                <Select style={{ width: '100%' }} onChange={(value) => this.onSourceChanged(value)}>
+                <Select value={this.originSource} style={{ width: '100%' }} onChange={(value) => this.onSourceChanged(value)}>
                     {this.state.sources && this.state.sources.map((source, key) => <Option key={key} value={key}>{source.name}</Option>)}
                 </Select>
             </FormItem>
@@ -187,13 +215,13 @@ const FormItem = Form.Item;
             ))}
             <h4>图表选项</h4>
             <FormItem {...formItemLayout} label='类型：'>
-                <Select style={{ width: '100%' }} onChange={(value) => this.onTypeChange(value)}>
+                <Select value={this.chartType} style={{ width: '100%' }} onChange={(value) => this.onTypeChange(value)}>
                     <Option value="bar" key="bar">柱状图</Option>
                     <Option value="line" key="line">折线图</Option>
                 </Select>
             </FormItem>
             <FormItem {...formItemLayout} label='标题：'>
-                <Input onChange={(e) => this.onTitleChange(e.target.value)} />
+                <Input value={this.chartTitle} onChange={(e) => this.onTitleChange(e.target.value)} />
             </FormItem>
             <Row >
                 <Col span="11" offset="2" >
@@ -203,14 +231,14 @@ const FormItem = Form.Item;
                 </Col>
                 <Col span="11">
                     <FormItem {...formItemLayoutSelect} label='标题：' >
-                        <Input data-xaxis={get(this.source, 'time', '@timestamp')} onChange={(e) => this.onTitleXChange(e)} />
+                        <Input value={this.xTitle} data-xaxis={get(this.source, 'time', '@timestamp')} onChange={(e) => this.onTitleXChange(e)} />
                     </FormItem>
                 </Col>
             </Row>
             <Row >
                 <Col span="11" offset="2" >
                     <FormItem {...formItemLayoutSelect} label='Y轴：'  >
-                        <Select style={{ width: '100%' }} onChange={(value) => this.onYaxisChange(value)}>
+                        <Select value={this.yaxis} style={{ width: '100%' }} onChange={(value) => this.onYaxisChange(value)}>
                             {get(this.source, 'field', []).map((field, key) => {
                                 return <Option value={field} key={key}>{field}</Option>
                             }
@@ -220,7 +248,72 @@ const FormItem = Form.Item;
                 </Col>
                 <Col span="11">
                     <FormItem {...formItemLayoutSelect} label='标题：' >
-                        <Input onChange={(e) => this.onTitleYChange(e.target.value)} />
+                        <Input value={this.YTitle} onChange={(e) => this.onTitleYChange(e.target.value)} />
+                    </FormItem>
+                </Col>
+            </Row>
+        </Form>
+
+        let antdFormEdit = <Form horizonal='true'>
+            <h4>指标选项</h4>
+            <FormItem {...formItemLayout} label='指标名：'>
+                <Input onChange={(e) => this.onNameChange(e.target.value)} value={this.data.name} />
+            </FormItem>
+            <FormItem {...formItemLayout} label='数据源：'>
+                <Select value={this.data.source} style={{ width: '100%' }} onChange={(value) => this.onSourceChanged(value)}>
+                    {this.state.sources && this.state.sources.map((source, key) => <Option key={key} value={key}>{source.name}</Option>)}
+                </Select>
+            </FormItem>
+            {this.fields.map((item, key) => (
+                <Row key={key}>
+                    <Col span="11" offset="2" >
+                        <FormItem {...formItemLayoutSelect} label='字段:'  >
+                            <Input value={item.field} disabled />
+                        </FormItem>
+                    </Col>
+                    <Col span="11">
+                        <FormItem {...formItemLayoutSelect} label='值：' >
+                            <Input data-field={item.field} onChange={(e) => this.onfieldNameChange(e)} />
+                        </FormItem>
+                    </Col>
+                </Row>
+            ))}
+            <h4>图表选项</h4>
+            <FormItem {...formItemLayout} label='类型：'>
+                <Select value={this.data.chart.type} style={{ width: '100%' }} onChange={(value) => this.onTypeChange(value)}>
+                    <Option value="bar" key="bar">bar</Option>
+                    <Option value="line" key="line">line</Option>
+                </Select>
+            </FormItem>
+            <FormItem {...formItemLayout} label='标题：'>
+                <Input value={this.data.chart.title} onChange={(e) => this.onTitleChange(e.target.value)} />
+            </FormItem>
+            <Row >
+                <Col span="11" offset="2" >
+                    <FormItem {...formItemLayoutSelect} label='X轴：'  >
+                        <Select style={{ width: '100%' }} value={get(this.source, 'time', '@timestamp')} disabled />
+                    </FormItem>
+                </Col>
+                <Col span="11">
+                    <FormItem {...formItemLayoutSelect} label='标题：' >
+                        <Input value={this.data.chart.x.label} data-xaxis={get(this.source, 'time', '@timestamp')} onChange={(e) => this.onTitleXChange(e)} />
+                    </FormItem>
+                </Col>
+            </Row>
+            <Row >
+                <Col span="11" offset="2" >
+                    <FormItem {...formItemLayoutSelect} label='Y轴：'  >
+                        <Select value={this.data.chart.y.field} style={{ width: '100%' }} onChange={(value) => this.onYaxisChange(value)}>
+                            {get(this.source, 'field', []).map((field, key) => {
+                                return <Option value={field} key={key}>{field}</Option>
+                            }
+                            )}
+                        </Select>
+                    </FormItem>
+                </Col>
+                <Col span="11">
+                    <FormItem {...formItemLayoutSelect} label='标题：' >
+                        <Input value={this.data.chart.y.label} onChange={(e) => this.onTitleYChange(e.target.value)} />
                     </FormItem>
                 </Col>
             </Row>
@@ -242,7 +335,7 @@ const FormItem = Form.Item;
                     onOk={this.onSaveChange.bind(this)}
                     onCancel={this.onCancelChange.bind(this)}
                 >
-                    {antdFormAdd}
+                    {antdFormEdit}
                 </Modal>
                 <Row gutter={5}>
                     <Col span={2} className="gutter-row">指标名:</Col>
