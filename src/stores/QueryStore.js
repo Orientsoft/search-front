@@ -1,7 +1,7 @@
 import { observable, extendObservable } from 'mobx';
 import * as moment from 'moment';
 import RequestBody from '../queries/RequestBody';
-import { terms } from '../queries/core/TermQuery';
+import { terms as termsQuery } from '../queries/core/TermQuery';
 import { dateHistogram, terms as termsAgg } from '../queries/core/BucketAggregation';
 
 /**
@@ -9,12 +9,17 @@ import { dateHistogram, terms as termsAgg } from '../queries/core/BucketAggregat
  * 只定义需要共享的查询参数，不需要作为查询参数的应该在AppStore里定义
  */
 export class QueryStore {
+    metadata = {};
+
     constructor() {
         extendObservable(this, {
             // 当前激活索引
-            index: [],
+            index: ['mobile-weblogic-jvm-*'],
             // 过滤字段
-            filterFields: ['message.msg.ThreadActiveCount'],
+            filterFields: [{
+                field: 'message.msg.ThreadActiveCount',
+                value: 5
+            }],
             // 日期格式
             momentFormat: 'YYYY-MM-DD HH:mm:ss',
             // 开始日期
@@ -24,13 +29,14 @@ export class QueryStore {
         });
     }
 
-    buildSearchBody(field, value) {
-        const searchBody = new RequestBody().add(terms({
-            [field]: [].concat(value)
+    buildSearch() {
+        const filterField = this.filterFields[0];
+        const body = new RequestBody().add(termsQuery({
+            [filterField.field]: [].concat(filterField.value)
         }));
 
-        return this.filterFields.reduce((body, filterField) => body.add(termsAgg(filterField, {
-            field: filterField
+        return body.add(termsAgg(filterField.field, {
+            field: filterField.field
         }).with(dateHistogram('@timestamp', {
             field: '@timestamp',
             format: 'yyyy-MM-dd',
@@ -40,7 +46,15 @@ export class QueryStore {
                 min: this.startMoment.format('YYYY-MM-DD'),
                 max: this.endMoment.format('YYYY-MM-DD')
             }
-        }))), searchBody);
+        })));
+    }
+
+    buildPagination(from = 0) {
+        const filterField = this.filterFields[0];
+        
+        return new RequestBody().from(from).add(termsQuery({
+            [filterField.field]: [].concat(filterField.value)
+        }));
     }
 }
 
