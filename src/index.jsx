@@ -5,6 +5,7 @@ import App from './components/App';
 import stores from './stores';
 import elastic from './services/elastic';
 import './less/styles.less';
+// import ReactChart from './components/ReactChart'
 
 // wrap App in AppContainer to support react hot loader
 const render = () => {

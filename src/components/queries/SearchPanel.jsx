@@ -1,10 +1,9 @@
 import React from 'react';
 import { Row, Col, Form, Checkbox, Button, Select, DatePicker } from 'antd';
-import { action } from 'mobx';
+import mobx, { action } from 'mobx';
 import { observer } from 'mobx-react';
 import * as moment from 'moment';
 import BaseComponent from '../BaseComponent';
-import fieldFilter from '../../queries/filters/datetime/field';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -103,10 +102,9 @@ const formItemLayout = {
     }
 
     onSearch(value) {
-        const requestBody = this.requestBody.index('core-*').add(fieldFilter('message.status', 'active')).highlight(['message.status']).toJSON();
-        console.log(requestBody)
-        
-        this.elastic.search(requestBody);
+        const requestBody = this.requestBody.index('mobile-weblogic-jvm-*').highlight(['message.msg.ThreadActiveCount']);
+        requestBody.add(this.queryStore.buildSearchBody('message.msg.ThreadActiveCount', 5));
+        this.elastic.search(requestBody.toJSON());
     }
 
     @action.bound onDateTimeChange(date, type) {
@@ -135,7 +133,7 @@ const formItemLayout = {
             <div>
                 <Row type="flex" justify="space-between" align="middle" gutter={24}>
                     <Col span={22}>
-                        <div ref={el => this.onInitDateTimeSlider(el)} />
+                        <input ref={el => this.onInitDateTimeSlider(el)} />
                     </Col>
                     <Col span={2}>
                         <Button size="large" type="primary" onClick={() => this.onSearch()}>搜索</Button>

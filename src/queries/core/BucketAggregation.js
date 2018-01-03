@@ -4,10 +4,10 @@ import { defineAggregation } from './Aggregation';
  * 桶聚合封装
  * 使用方法：
  *   this.elastic.search({
- *     aggs: terms({ field: 'TranName' }).toJSON()
+ *     aggs: terms('TranName', { field: 'TranName' }).toJSON()
  *   });
  */
-export const dateHistogram = defineAggregation('date_history');
+export const dateHistogram = defineAggregation('date_histogram');
 export const dateRange = defineAggregation('date_range');
 export const filter = defineAggregation('filter');
 export const filters = defineAggregation('filters');

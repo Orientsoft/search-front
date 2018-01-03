@@ -90,7 +90,7 @@ class BaseComponent extends React.Component {
     getBuckets(agg, result) {
         const queryResult = result || this.appStore.queryResult;
 
-        return get(queryResult, `aggregations.${agg}.buckets`, []);
+        return get(queryResult, ['aggregations', agg, 'buckets'], []);
     }
 }
 
