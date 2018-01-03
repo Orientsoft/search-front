@@ -102,8 +102,8 @@ const formItemLayout = {
     }
 
     onSearch(value) {
-        const requestBody = this.requestBody.index('core-*').highlight(['message.status']);
-        requestBody.add(this.queryStore.buildSearchBody('message.status', 'active'));
+        const requestBody = this.requestBody.index('mobile-weblogic-jvm-*').highlight(['message.msg.ThreadActiveCount']);
+        requestBody.add(this.queryStore.buildSearchBody('message.msg.ThreadActiveCount', 5));
         this.elastic.search(requestBody.toJSON());
     }
 

@@ -2,7 +2,7 @@ import { observable, extendObservable } from 'mobx';
 import * as moment from 'moment';
 import RequestBody from '../queries/RequestBody';
 import { terms } from '../queries/core/TermQuery';
-import { dateHistogram } from '../queries/core/BucketAggregation';
+import { dateHistogram, terms as termsAgg } from '../queries/core/BucketAggregation';
 
 /**
  * 保存查询条件的Store
@@ -14,7 +14,7 @@ export class QueryStore {
             // 当前激活索引
             index: [],
             // 过滤字段
-            filterFields: ['@timestamp'],
+            filterFields: ['message.msg.ThreadActiveCount'],
             // 日期格式
             momentFormat: 'YYYY-MM-DD HH:mm:ss',
             // 开始日期
@@ -29,16 +29,18 @@ export class QueryStore {
             [field]: [].concat(value)
         }));
 
-        return this.filterFields.reduce((body, filterField) => body.add(dateHistogram(filterField, {
-            field: filterField,
+        return this.filterFields.reduce((body, filterField) => body.add(termsAgg(filterField, {
+            field: filterField
+        }).with(dateHistogram('@timestamp', {
+            field: '@timestamp',
             format: 'yyyy-MM-dd',
-            interval: 'month',
+            interval: 'day',
             min_doc_count: 0,
             extended_bounds: {
                 min: this.startMoment.format('YYYY-MM-DD'),
                 max: this.endMoment.format('YYYY-MM-DD')
             }
-        })), searchBody);
+        }))), searchBody);
     }
 }
 
