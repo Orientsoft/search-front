@@ -25,9 +25,11 @@ export default {
      * @param {Object} query
      * @return {Promise}
      */
-    search: (query) => {
+    search: (query, shouldSaveResult = true) => {
         return client.search(query).then((result) => {
-            store.appStore.queryResult = result;
+            if (shouldSaveResult) {
+                store.appStore.queryResult = result;
+            }
             return result;
         }).catch(throwQueryError('search()'));
     },

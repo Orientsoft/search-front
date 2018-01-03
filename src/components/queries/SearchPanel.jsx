@@ -102,9 +102,13 @@ const formItemLayout = {
     }
 
     onSearch(value) {
-        const requestBody = this.requestBody.index('mobile-weblogic-jvm-*').highlight(['message.msg.ThreadActiveCount']);
-        requestBody.add(this.queryStore.buildSearchBody('message.msg.ThreadActiveCount', 5));
+        if (this.xx) {
+            console.log('pagination: ', this.queryStore.buildPagination().toJSON());
+        }
+        const requestBody = this.requestBody.highlight(['message.msg.ThreadActiveCount']);
+        requestBody.add(this.queryStore.buildSearch());
         this.elastic.search(requestBody.toJSON());
+        this.xx = 1;
     }
 
     @action.bound onDateTimeChange(date, type) {
