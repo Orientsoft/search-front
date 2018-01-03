@@ -21,7 +21,8 @@ const cols = [
 	{ 'field': 'status', 'label': '状态' },
 	{ 'field': 'process', 'label': '进程ID' },
 	{ 'field': 'machine', 'label': '机器' }, 
-	{ 'field': 'osUser', 'label': '系统用户' }
+	{ 'field': 'osUser', 'label': '系统用户' },
+	{ 'field': 'sqlText', 'label': '查询语句' }
 ]
 @observer class TabContent extends BaseComponent {
 	constructor(props, context) {
@@ -72,7 +73,8 @@ const cols = [
 					title: col['label'],
 					dataIndex: col['field'],
 					key: col['filed'],
-					render: (text) => <p className="wordBreak" dangerouslySetInnerHTML={{ __html: text }} />
+					// width: 250,
+					render: (text) => <p className="ellipsis" dangerouslySetInnerHTML={{ __html: text }} />
 				}
 			}
 		})
@@ -153,7 +155,7 @@ const cols = [
 				<Card>
 					<Tabs defaultActiveKey="1">
 						<TabPane tab="详情" key="1">
-							{this.tableData.length > 0 && <Table columns={this.columns} dataSource={this.tableData} pagination={pagination} scroll={{ x: 1500 }} ></Table>}
+							{this.tableData.length > 0 && <Table columns={this.columns} dataSource={this.tableData} pagination={pagination} scroll={{ x: 200 * this.columns.length }} ></Table>}
 						</TabPane>
 						<TabPane tab="图表" key="2">
 							{/* this.chartData.length > 0 && <Chart data={this.chartData} /> */}
