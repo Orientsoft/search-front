@@ -29,15 +29,17 @@ const chartConfig = [
         this.barChartPlotter = this.barChartPlotter.bind(this);
         this.darkenColor = this.darkenColor.bind(this);
     }
+
     @computed get data() {
-        const buckets = this.getBuckets('osUser');
+        const aggs = this.getBuckets(this.queryStore.filterFields[0]);
 
-        return buckets.map(bucket => {
-            const date = moment(bucket.key).unix();
-            return [new Date(date), bucket.doc_count];
-        });
+        return aggs.map(agg => this.getBuckets('@timestamp', {
+            aggregations: agg
+        })).reduce((result, buckets) => result.concat(buckets.map(bucket => [
+            new Date(bucket.key),
+            bucket.doc_count
+        ])), []);
     }
-
 
     render() {
         return (
