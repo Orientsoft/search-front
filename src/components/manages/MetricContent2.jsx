@@ -17,6 +17,7 @@ const FormItem = Form.Item;
 
     // 需要提交保存的数据
     data = { name: '', source: '', fields: [], chart: { title: '', type: '', x: { field: '', label: '' }, y: { field: '', label: '' } } }
+    name = ''
 
     constructor(props) {
         super(props)
@@ -28,10 +29,23 @@ const FormItem = Form.Item;
     componentWillMount() {
         this.elastic.getmetricDataSource().then(result => {
             let data = get(result, 'hits.hits', []).map(data => data._source);
-            for(let key in data){
+            for (let key in data) {
                 this.dataSource[key] = JSON.parse(data[key].data)
+                this.dataSource[key]['fieldShow'] = []
             }
-            console.log('mutipledata',this.dataSource );
+
+            for (let key in this.dataSource.slice()) {
+                let fields = this.dataSource[key].fields
+                var allshow = []
+                for (let j in fields.slice()) {
+                    let field = fields[j].field
+                    let value = fields[j].value
+                    let show = field + ' = ' + value
+                    allshow.push(show)  
+                }
+                this.dataSource[key].fieldShow = allshow
+            }
+            console.log('ddd', this.dataSource.slice())
         })
         this.elastic.getSingleDataSource().then(result => {
             this.setState({
@@ -59,47 +73,54 @@ const FormItem = Form.Item;
     }
 
     onNameChange(e) {
-        console.log("name", e)
         this.data.name = e;
     }
 
-    onfieldNameChange(e){
+    onfieldNameChange(e) {
         var field = e.target.dataset.field
         var value = e.target.value
-        var obj = { field:field,value:value}
+        var obj = { field: field, value: value }
         this.data.fields.push(obj)
     }
 
     onTypeChange(e) {
-        console.log("type", e)
         this.data.chart.type = e;
     }
-   
+
     onTitleChange(e) {
-        console.log("title", e)
         this.data.chart.title = e;
     }
     onYaxisChange(e) {
-        console.log("yaxis", e)
         this.data.chart.y.field = e;
     }
     onTitleYChange(e) {
-        console.log("titleY", e)
         this.data.chart.y.label = e;
     }
     onTitleXChange(e) {
-        console.log("titleX", e.target.dataset.xaxis, e.target.value)
         this.data.chart.x.label = e.target.value;
         this.data.chart.x.field = e.target.dataset.xaxis;
     }
-    
+
     onSave(e) {
-        console.log('this.data',JSON.stringify(this.data))
         this.elastic.saveMetricDataSource(this.data.name, {
             data: JSON.stringify(this.data)
         });
+        this.dataSource.push(this.data)
+       
+        //设置显示的字段
+        let length = this.dataSource.length - 1
+        this.dataSource[length]['fieldShow'] = []
+        let fields = this.dataSource[length].fields
+        var allshow = []
+        for (let key in fields.slice()) {
+            let field = fields[key].field
+            let value = fields[key].value
+            let show = field + ' = ' + value
+             allshow.push(show)
+        }
+        this.dataSource[length].fieldShow = allshow
         this.props.setVisible(false);
-        // onChange={this.onSourceChanged}
+       
     }
     onCancel() {
         this.props.setVisible(false);
@@ -112,11 +133,13 @@ const FormItem = Form.Item;
             visibleEdit: false
         })
     }
-    onEditSource(e){
+    onEditSource(e) {
 
     }
-    onDeleteSource(e){
-
+    @action onDeleteSource(key,name) {
+        const source = this.dataSource.splice(key, 1)[0];
+        // this.enableEdit[key] = false;
+        this.elastic.deleteMetricDataSource(name);
     }
 
     render() {
@@ -155,7 +178,7 @@ const FormItem = Form.Item;
             ))}
             <h4>图表选项</h4>
             <FormItem {...formItemLayout} label='类型：'>
-                <Select  style={{ width: '100%' }} onChange={(value) => this.onTypeChange(value)}>
+                <Select style={{ width: '100%' }} onChange={(value) => this.onTypeChange(value)}>
                     <Option value="bar" key="bar">柱状图</Option>
                     <Option value="line" key="line">折线图</Option>
                 </Select>
@@ -171,7 +194,7 @@ const FormItem = Form.Item;
                 </Col>
                 <Col span="11">
                     <FormItem {...formItemLayoutSelect} label='标题：' >
-                        <Input  data-xaxis={get(this.source, 'time', '@timestamp')} onChange={(e) => this.onTitleXChange(e)} />
+                        <Input data-xaxis={get(this.source, 'time', '@timestamp')} onChange={(e) => this.onTitleXChange(e)} />
                     </FormItem>
                 </Col>
             </Row>
@@ -194,8 +217,6 @@ const FormItem = Form.Item;
             </Row>
         </Form>
 
-
-
         return (
             <div>
                 <Modal
@@ -217,13 +238,13 @@ const FormItem = Form.Item;
                 <Row gutter={5}>
                     <Col span={2} className="gutter-row">指标名:</Col>
                     <Col span={2} className="gutter-row">数据源:</Col>
-                    <Col span={4} className="gutter-row">字段</Col>
-                    <Col span={2} className="gutter-row">图表类型</Col>
-                    <Col span={2} className="gutter-row">标题</Col>
-                    <Col span={2} className="gutter-row">X轴</Col>
-                    <Col span={2} className="gutter-row">X轴标题</Col>
-                    <Col span={2} className="gutter-row">Y轴</Col>
-                    <Col span={2} className="gutter-row">X轴标题</Col>
+                    <Col span={4} className="gutter-row">字段:</Col>
+                    <Col span={2} className="gutter-row">图表类型:</Col>
+                    <Col span={2} className="gutter-row">标题:</Col>
+                    <Col span={2} className="gutter-row">X轴字段:</Col>
+                    <Col span={2} className="gutter-row">X轴标题:</Col>
+                    <Col span={2} className="gutter-row">Y轴字段:</Col>
+                    <Col span={2} className="gutter-row">Y轴标题:</Col>
                 </Row>
                 <div className='contentManager'>
                     {this.dataSource.slice().map((item, key) => {
@@ -238,34 +259,33 @@ const FormItem = Form.Item;
                                 <Select
                                     mode="tags"
                                     placeholder="Please select"
-                                    // value={item.fields ? item.fields.slice() : item.fields}
+                                    value={item.fieldShow}
                                     style={{ width: '100%' }}
-                                    onChange={(value) => this.onEditKey(value)}
-                                    // disabled={!this.enableEdit[key]}
+                                    disabled
                                 >
                                 </Select>
                             </Col>
                             <Col span={2} className="gutter-row">
-                                <Input value={item.chart?item.chart.type:''} disabled key={key} />
+                                <Input value={item.chart ? item.chart.type : ''} disabled key={key} />
                             </Col>
                             <Col span={2} className="gutter-row">
-                                <Input value={item.chart?item.chart.title:''} disabled key={key} />
+                                <Input value={item.chart ? item.chart.title : ''} disabled key={key} />
                             </Col>
                             <Col span={2} className="gutter-row">
-                                <Input value={item.chart?item.chart.x.field:''} disabled key={key} />
+                                <Input value={item.chart ? item.chart.x.field : ''} disabled key={key} />
                             </Col>
                             <Col span={2} className="gutter-row">
-                                <Input value={item.chart?item.chart.x.label:''} disabled key={key} />
+                                <Input value={item.chart ? item.chart.x.label : ''} disabled key={key} />
                             </Col>
                             <Col span={2} className="gutter-row">
-                                <Input value={item.chart?item.chart.y.field:''} disabled key={key} />
+                                <Input value={item.chart ? item.chart.y.field : ''} disabled key={key} />
                             </Col>
                             <Col span={2} className="gutter-row">
-                                <Input value={item.chart?item.chart.y.label:''} disabled key={key} />
+                                <Input value={item.chart ? item.chart.y.label : ''} disabled key={key} />
                             </Col>
                             <Col span={4} className="gutter-row">
                                 <Button onClick={() => this.onEditSource(key, item.name)} >编辑</Button>
-                                <Button onClick={() => this.onDeleteSource(key)}>删除</Button>
+                                <Button onClick={() => this.onDeleteSource(key,item.name)}>删除</Button>
                             </Col>
                         </Row>)
                     })}
