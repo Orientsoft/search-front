@@ -30,11 +30,11 @@ class RequestBody {
      * @return {RequestBody}
      */
     __box(key, value) {
-        if (this.body.hasOwnProperty(key)) {
-            this.body[key].set(value);
+        if (this.body.body.hasOwnProperty(key)) {
+            this.body.body[key].set(value);
         } else {
             // 原始值的改动并不会直接被mobx追踪到，此处需要利用observable.box()方法进行装箱
-            this.body[key] = observable.box(value);
+            this.body.body[key] = observable.box(value);
         }
         // 返回自身，以便可以进行链式调用
         return this;

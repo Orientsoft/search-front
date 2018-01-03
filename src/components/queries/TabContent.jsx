@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs, Table, Button, Modal, Card, Collapse } from 'antd';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
+import { observable, computed } from 'mobx';
 import set from 'lodash/set';
 import forEach from 'lodash/forEach';
 import BaseComponent from '../BaseComponent';
@@ -10,21 +10,20 @@ import { merge } from 'lodash'
 
 const Panel = Collapse.Panel;
 const TabPane = Tabs.TabPane;
-const pagination = {
-	defaultPageSize: 5
-}
+
 
 const cols = [
 	{ 'field': '@timestamp', 'label': '时间' },
 	{ 'field': 'index', 'label': '数据源' },
 	{ 'field': 'host', 'label': '主机' },
-	{ 'field': 'status', 'label': '状态' },
-	{ 'field': 'process', 'label': '进程ID' },
-	{ 'field': 'machine', 'label': '机器' }, 
-	{ 'field': 'osUser', 'label': '系统用户' },
-	{ 'field': 'sqlText', 'label': '查询语句' }
+	{ 'field': 'state', 'label': '状态' },
+	{ 'field': 'ThreadActiveCount', 'label': '线程激活数量' },
+	{ 'field': 'ServerName', 'label': '主机名' },
+	{ 'field': 'ThreadPoolSize', 'label': 'ThreadPoolSize' },
+	{ 'field': 'DomainName', 'label': 'DomainName' }
 ]
 @observer class TabContent extends BaseComponent {
+
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
@@ -36,7 +35,15 @@ const cols = [
 		}
 		this.showModal = this.showModal.bind(this);
 		this.hideModal = this.hideModal.bind(this);
+		this.onPageChange = this.onPageChange.bind(this)
+		this.pagination = {
+			defaultPageSize: 5,
+			showQuickJumper: true,
+			onChange: this.onPageChange
+		}
 	}
+
+
 
 	@computed get chartData() {
 		return this.appStore.currentAggs.map(agg => {
@@ -64,7 +71,7 @@ const cols = [
 					dataIndex: col['field'],
 					key: col['field'],
 					width: 150,
-					fixed: 'left', 
+					fixed: 'left',
 					render: (text) => <p className="wordBreak" dangerouslySetInnerHTML={{ __html: text }} />
 				}
 			}
@@ -88,8 +95,12 @@ const cols = [
 		})
 		return column;
 	}
+	
 	@computed get tableData() {
-		return this.getHits().map((hit, key) => {
+		if (!this.state.result.length) {
+			this.state.result = this.getHits();
+		};
+		return this.state.result.map((hit, key) => {
 			forEach(hit.highlight, (value, key) => {
 				set(hit._source, key, value.toString());
 			});
@@ -107,9 +118,16 @@ const cols = [
 						[filed]: source[filed]
 					}
 				} else {
-					return {
-						[filed]: source['message'][filed]
+					if (source['message'][filed]) {
+						return {
+							[filed]: source['message'][filed]
+						}
+					} else if (source['message']['msg'][filed]) {
+						return {
+							[filed]: source['message']['msg'][filed]
+						}
 					}
+
 				}
 
 			})
@@ -125,37 +143,15 @@ const cols = [
 	}
 
 	render() {
-		//配置表格参数
-		// console.log(this.columns)
-		// const columns = [{
-		// 	title: '时间',
-		// 	dataIndex: 'date',
-		// 	key: 'date',
-		// 	width: '25%'
-		// }, {
-		// 	title: '类型',
-		// 	dataIndex: 'type',
-		// 	key: 'type',
-		// 	width: '10%',
-		// }, {
-		// 	title: '数据',
-		// 	dataIndex: 'data',
-		// 	key: 'data',
-		// 	width: '60%',
-		// 	render: (text) => <p className="wordBreak" dangerouslySetInnerHTML={{ __html: text }} />
-		// }, {
-		// 	title: '详情',
-		// 	dataIndex: 'hit',
-		// 	key: 'hit',
-		// 	width: '5%',
-		// 	render: (text) => <Button type="primary" onClick={() => this.showModal(text)}>详情</Button>
-		// }]
+
+		console.log('tableData');
+		console.log(this.tableData);
 		return (
 			<div className="tabContent">
 				<Card>
 					<Tabs defaultActiveKey="1">
 						<TabPane tab="详情" key="1">
-							{this.tableData.length > 0 && <Table columns={this.columns} dataSource={this.tableData} pagination={pagination} scroll={{ x: 200 * this.columns.length }} ></Table>}
+							{this.tableData.length > 0 && <Table columns={this.columns} dataSource={this.tableData} pagination={this.pagination} scroll={{ x: 200 * this.columns.length }}  ></Table>}
 						</TabPane>
 						<TabPane tab="图表" key="2">
 							{/* this.chartData.length > 0 && <Chart data={this.chartData} /> */}
@@ -194,6 +190,23 @@ const cols = [
 			showModalData: text
 		})
 	}
+
+	componentWillMount() {
+		this.pageCount = Math.ceil(this.queryStore.size / this.pagination.defaultPageSize);
+	}
+
+	onPageChange(page, pageSize) {
+		
+		console.log('page=' + page);
+		if ( page >= this.pageCount ){
+			this.elastic.search(this.queryStore.buildPagination( 5 * (page - 1) + 1).toJSON(), false).then(result => {
+				this.setState({
+					result: this.state.result.concat(this.getHits(result))
+				}, () => this.pageCount = Math.ceil(this.state.result.length / this.pagination.defaultPageSize));
+			});
+		}
+	}
+
 	hideModal() {
 		this.setState({
 			visible: false
