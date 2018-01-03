@@ -1,21 +1,24 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
-import { Row, Col, Select, Input, Button, Modal } from 'antd';
+import { Row, Col, Select, Input, Button, Modal, Form } from 'antd';
 import get from 'lodash/get';
+import values from 'lodash/values'
 import BaseComponent from '../BaseComponent';
-import getFields from  '../../utils/fields';
+import getFields from '../../utils/fields';
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
+const FormItem = Form.Item;
 
-@observer class DataSourceItem extends BaseComponent {
-//select option
+@observer class DataSourceItem2 extends BaseComponent {
+    //select option
     @observable.ref types = ['db', 'weblogic', 'tuxedo', '业务', '系统']
     @observable.ref fields = []
     @observable.ref indices = []
     @observable.ref time = []
     @observable dataSource = []
+    @observable dataSourceshow = []
     @observable enableEdit = []
     //select 显示的value
     @observable keys = []
@@ -23,19 +26,34 @@ const confirm = Modal.confirm;
     @observable category = ''
     @observable index = ''
     @observable ts = ''
+    xfields = {}
 
 
     // 需要提交保存的数据
-    data = { category: '', index: '', fields: [], name: '', time: [] }
+    data = { category: '', index: '', fields: [], name: '', time: [], field: [] }
     name = ''
 
     constructor(props) {
         super(props)
+        this.state = {
+            visible: this.props.visible,
+            visibleEdit: false
+        }
     }
 
     componentWillMount() {
         this.elastic.getSingleDataSource().then(result => {
             this.dataSource = get(result, 'hits.hits', []).map(data => data._source);
+            for (var i = 0; i < this.dataSource.length; i++) {
+                let fields = JSON.parse(this.dataSource[i].fields)
+                let allkeys = []
+                for (var j = 0; j < fields.length; j++) {
+                    let key = fields[j].label
+                    allkeys.push(key)
+                }
+                this.dataSource[i].keys = allkeys
+            }
+            console.log('all', this.dataSource.slice())
             this.enableEdit = Array(this.dataSource.length);
         });
         this.elastic.catIndices().then(action(indices => {
@@ -47,14 +65,13 @@ const confirm = Modal.confirm;
         this.elastic.getIndices(index).then(action(result => {
             const mappings = get(result, [index, 'mappings'], {});
             const type = Object.keys(mappings)[0];
-            
+
             this.fields = getFields(mappings[type]);
-            for(let key in  this.fields){
-                if(this.fields[key] == "@timestamp"){
+            for (let key in this.fields) {
+                if (this.fields[key] == "@timestamp") {
                     this.time.push(this.fields[key])
                 }
             }
-            console.log(' this.fields', this.fields);
         }));
     }
 
@@ -70,6 +87,7 @@ const confirm = Modal.confirm;
         this.ts = []
         this.keys = []
         this.index = index;
+
         this.getAllKeys(index)
     }
 
@@ -79,7 +97,7 @@ const confirm = Modal.confirm;
     }
 
     onKeyChange(value) {
-        this.data.fields = value;
+        this.data.field = value;
         this.keys = value;
     }
 
@@ -88,12 +106,27 @@ const confirm = Modal.confirm;
         this.originname = value;
     }
 
+    onfieldNameChange(e) {
+        let value = e.target.value
+        let field = e.target.dataset.field
+        let obj = {
+            field: field,
+            label: value
+        }
+        this.xfields[field] = obj;
+    }
+
     onEditType(type) {
         this.data.category = type;
+        console.log(this.data.category)
     }
 
     onEditIndex(index) {
         this.data.index = index;
+        this.data.time = []
+        this.data.fields = []
+        this.data.field = []
+        this.data.keys = []
         this.getAllKeys(index)
     }
 
@@ -104,37 +137,104 @@ const confirm = Modal.confirm;
 
     onEditKey(value) {
         this.getAllKeys(this.data.index)
-        this.data.fields = value;
+        this.data.field = value;
+        //删除字段时对应的中文字段没有删除
+        for (var i = 0; i < value.length; i++) {           
+                i = value.length - 1
+                let obj = { field: value[i], label: '' }
+                this.data.fields.push(obj)
+        }
+    }
+    onEditFieldName(e) {
+        let value = e.target.value
+        let field = e.target.dataset.field
+        // let obj = {
+        //     field: field,
+        //     label: value
+        // }
+        for (let key in this.data.fields.slice()) {
+            if (this.data.fields[key].field == field) {
+                this.data.fields[key].label = value
+            }
+        }
+        // this.xfields[field] = obj;
     }
 
     onSave() {
+        var fields = values(this.xfields);
+        this.data.fields = JSON.stringify(fields)
         this.elastic.saveSingleDataSource(this.data.name, this.data);
         this.dataSource.push(this.data);
+        for (var i = 0; i < this.dataSource.length; i++) {
+            let fields = JSON.parse(this.dataSource[i].fields)
+            let keys = []
+            for (var j = 0; j < fields.length; j++) {
+                let key = fields[j].label
+                keys.push(key)
+            }
+            this.dataSource[i].keys = keys
+        }
+
 
         this.enableEdit.push(false);
         this.fields = []
         this.time = []
         this.data = {}
+        this.xfields = {}
 
         this.keys = []
         this.category = ''
         this.index = ''
         this.ts = ''
         this.originname = ''
+        this.props.setVisible(false)
 
     }
 
+    onCancel() {
+        this.fields = []
+        this.time = []
+        this.data = {}
+        this.xfields = {}
+
+        this.keys = []
+        this.category = ''
+        this.index = ''
+        this.ts = ''
+        this.originname = ''
+        this.props.setVisible(false)
+    }
+
+    onCancelEdit() {
+        this.setState({
+            visibleEdit: false
+        })
+        this.data = {}
+    }
+
     onSaveChange(key, name) {
-        console.log("this.data", this.data)
+        this.data.fields = JSON.stringify(this.data.fields)
+
         this.elastic.updateSingleDataSource(this.data.name, this.data);
-        // for(let i=0; i< this.dataSource.length;i++){
-        //     if(this.dataSource[i].name == name){
-        //         // this.dataSource[i] = this.data
-        //         this.appStore.singleDatas[i] = this.data
-        //     }
-        // }
-        // this.dataSource.push(this.data);
-        // this.data = {}
+        for (var i = 0; i < this.dataSource.length; i++) {
+
+            if (this.dataSource[i].name == this.data.name) {
+                this.dataSource[i] = this.data
+
+                let fields = JSON.parse(this.dataSource[i].fields)
+                let allkeys = []
+                for (var j = 0; j < fields.length; j++) {
+                    let key = fields[j].label
+                    allkeys.push(key)
+                }
+                this.dataSource[i].keys = allkeys
+
+                console.log("savechange", this.dataSource.slice())
+            }
+        }
+        this.setState({
+            visibleEdit: false
+        })
 
         this.enableEdit[key] = false;
         this.fields = []
@@ -142,115 +242,200 @@ const confirm = Modal.confirm;
         this.data = {}
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            visible: nextProps.visible
+        });
+    }
+
     render() {
+        const formItemLayout = {
+            labelCol: { span: 6 },
+            wrapperCol: { span: 18 }
+        }
+        const formItemLayoutSelect = {
+            labelCol: { span: 9 },
+            wrapperCol: { span: 15 }
+        }
+        //添加数据源
+        let antdFormAdd = <Form horizonal='true' >
+            <FormItem {...formItemLayout} label='名称:'>
+                <Input onChange={(e) => this.onNameChange(e.target.value)} value={this.originname} />
+            </FormItem>
+            <FormItem {...formItemLayout} label='类型:'>
+                <Select style={{ width: '100%' }} value={this.category} onChange={(value) => this.onTypeChange(value)}>
+                    {
+                        this.types && this.types.map((type, key) => {
+                            return <Option value={type} key={key}>{type}</Option>
+                        })
+                    }
+                </Select>
+            </FormItem>
+            <FormItem {...formItemLayout} label='数据源:'>
+                <Select style={{ width: '100%' }} value={this.index} onChange={(value) => this.onIndexChange(value)}>
+                    {
+                        this.indices && this.indices.map((index, key) => {
+                            return <Option value={index} key={key}>{index}</Option>
+                        })
+                    }
+                </Select>
+            </FormItem>
+            <FormItem {...formItemLayout} label='时间:'>
+                <Select style={{ width: '100%' }} value={this.ts} onChange={(value) => this.onTimeChange(value)}>
+                    {
+                        this.time && this.time.map((index, key) => {
+                            return <Option value={index} key={key}>{index}</Option>
+                        })
+                    }
+                </Select>
+            </FormItem>
+            <FormItem {...formItemLayout} label='字段选择'>
+                <Select
+                    mode="tags"
+                    placeholder="Please select"
+                    value={this.keys.slice()}
+                    style={{ width: '100%' }}
+                    onChange={(value) => this.onKeyChange(value)}
+                >
+                    {
+                        this.fields && this.fields.map((field, key) => {
+                            return <Option value={field} key={key}>{field}</Option>
+                        })
+                    }
+                </Select>
+            </FormItem>
+            {this.data.field && this.data.field.map((field, key) => (
+                <Row key={key}>
+                    <Col span="11" offset="2" >
+                        <FormItem {...formItemLayoutSelect} label='字段'  >
+                            <Input value={field} disabled />
+                        </FormItem>
+                    </Col>
+                    <Col span="11">
+                        <FormItem {...formItemLayoutSelect} label='名称' >
+                            <Input data-field={field} onChange={(e) => this.onfieldNameChange(e)} />
+                        </FormItem>
+                    </Col>
+                </Row>
+            ))}
+        </Form>
+        //修改数据源
+        let editForm = <Form horizonal='true' >
+            <FormItem {...formItemLayout} label='名称:'>
+                <p>{this.data.name}</p>
+            </FormItem>
+            <FormItem {...formItemLayout} label='类型:'>
+                <Select style={{ width: '100%' }} value={this.data.category} onChange={(value) => this.onEditType(value)}>
+                    {
+                        this.types && this.types.map((type, key) => {
+                            return <Option value={type} key={key}>{type}</Option>
+                        })
+                    }
+                </Select>
+            </FormItem>
+            <FormItem {...formItemLayout} label='数据源:'>
+                <Select style={{ width: '100%' }} value={this.data.index} onChange={(value) => this.onEditIndex(value)}>
+                    {
+                        this.indices && this.indices.map((index, key) => {
+                            return <Option value={index} key={key}>{index}</Option>
+                        })
+                    }
+                </Select>
+            </FormItem>
+            <FormItem {...formItemLayout} label='时间:'>
+                <Select style={{ width: '100%' }} value={this.data.time} onChange={(value) => this.onEditTime(value)}>
+                    {
+                        this.time && this.time.map((index, key) => {
+                            return <Option value={index} key={key}>{index}</Option>
+                        })
+                    }
+                </Select>
+            </FormItem>
+            <FormItem {...formItemLayout} label='字段选择'>
+                <Select
+                    mode="tags"
+                    placeholder="Please select"
+                    value={this.data.field ? this.data.field.slice() : this.data.field}
+                    style={{ width: '100%' }}
+                    onChange={(value) => this.onEditKey(value)}
+                >
+                    {
+                        this.fields && this.fields.map((field, key) => {
+                            return <Option value={field} key={key}>{field}</Option>
+                        })
+                    }
+                </Select>
+            </FormItem>
+            {(this.data.fields ? this.data.fields.slice() : this.data.fields) && this.data.fields.slice().map((item, key) => (
+                <Row key={key}>
+                    <Col span="11" offset="2" >
+                        <FormItem {...formItemLayoutSelect} label='字段'  >
+                            <Input value={item.field} disabled />
+                        </FormItem>
+                    </Col>
+                    <Col span="11">
+                        <FormItem {...formItemLayoutSelect} label='名称' >
+                            <Input data-field={item.field} value={item.label} onChange={(e) => this.onEditFieldName(e)} />
+                        </FormItem>
+                    </Col>
+                </Row>
+            ))}
+        </Form>
+
         return (
             <div>
-                <div className='contentManager'>
-                    <Row gutter={16}>
-                        <Col span={2} className="gutter-row">类型:</Col>
-                        <Col span={3} className="gutter-row">数据源:</Col>
-                        <Col span={3} className="gutter-row">时间:</Col>
-                        <Col span={8} className="gutter-row">字段选择:</Col>
-                        <Col span={3} className="gutter-row">名称:</Col>
-                    </Row>
-
-                    <Row gutter={16} style={{ display: this.props.add }}>
-                        <Col span={2} className="gutter-row">
-                            <Select style={{ width: '100%' }} value={this.category} onChange={(value) => this.onTypeChange(value)}>
-                                {
-                                    this.types && this.types.map((type, key) => {
-                                        return <Option value={type} key={key}>{type}</Option>
-                                    })
-                                }
-                            </Select>
-                        </Col>
-                        <Col span={3} className="gutter-row">
-                            <Select style={{ width: '100%' }} value={this.index} onChange={(value) => this.onIndexChange(value)}>
-                                {
-                                    this.indices && this.indices.map((index, key) => {
-                                        return <Option value={index} key={key}>{index}</Option>
-                                    })
-                                }
-                            </Select>
-                        </Col>
-                        <Col span={3} className="gutter-row">
-                            <Select style={{ width: '100%' }} value={this.ts} onChange={(value) => this.onTimeChange(value)}>
-                                {
-                                    this.time && this.time.map((index, key) => {
-                                        return <Option value={index} key={key}>{index}</Option>
-                                    })
-                                }
-                            </Select>
-                        </Col>
-
-                        <Col span={8} className="gutter-row">
-                            <Select
-                                mode="tags"
-                                placeholder="Please select"
-                                value={this.keys.slice()}
-                                style={{ width: '100%' }}
-                                onChange={(value) => this.onKeyChange(value)}
-                            >
-                                {
-                                    this.fields && this.fields.map((field, key) => {
-                                        return <Option value={field} key={key}>{field}</Option>
-                                    })
-                                }
-                            </Select>
-                        </Col>
-                        <Col span={3} className="gutter-row">
-                            <Input onChange={(e) => this.onNameChange(e.target.value)} value={this.originname} />
-                        </Col>
-                        <Col span={5} className="gutter-row">
-                            <Button type="primary" onClick={() => this.onSave()}>保存</Button>
-                        </Col>
-                    </Row>
-                </div>
+                <Modal
+                    title="add"
+                    visible={this.state.visible}
+                    onOk={this.onSave.bind(this)}
+                    onCancel={this.onCancel.bind(this)}
+                >
+                    {antdFormAdd}
+                </Modal>
+                <Modal
+                    title="edit"
+                    visible={this.state.visibleEdit}
+                    onOk={this.onSaveChange.bind(this)}
+                    onCancel={this.onCancelEdit.bind(this)}
+                >
+                    {editForm}
+                </Modal>
+                <Row gutter={16}>
+                    <Col span={2} className="gutter-row">类型:</Col>
+                    <Col span={5} className="gutter-row">数据源:</Col>
+                    <Col span={3} className="gutter-row">时间:</Col>
+                    <Col span={8} className="gutter-row">字段:</Col>
+                    <Col span={2} className="gutter-row">名称:</Col>
+                </Row>
 
                 <div className='contentManager'>
-                    {this.dataSource.map((item, key) => {
-                        
+                    {this.dataSource.slice().map((item, key) => {
                         return (<Row gutter={16} key={key}>
                             <Col span={2} className="gutter-row">
-                                <Select value={item.category} style={{ width: '100%' }} disabled={!this.enableEdit[key]} onChange={(value) => this.onEditType(value)}>
-                                    {this.types.slice() && this.types.slice().map((item, key) => {
-                                        return <Option value={item} key={key}>{item}</Option>
-                                    })}
-                                </Select>
+                                <Input value={item.category} disabled key={key} ></Input>
+                            </Col>
+                            <Col span={5} className="gutter-row">
+                                <Input value={item.index} disabled key={key} ></Input>
                             </Col>
                             <Col span={3} className="gutter-row">
-                                <Select value={item.index} style={{ width: '100%' }} disabled={!this.enableEdit[key]} onChange={(value) => this.onEditIndex(value)}>
-                                    {this.indices.slice() && this.indices.slice().map((item, key) => {
-                                        return <Option value={item} key={key}>{item}</Option>
-                                    })}
-                                </Select>
-                            </Col>
-                            <Col span={3} className="gutter-row">
-                                <Select style={{ width: '100%' }} value={item.time} disabled={!this.enableEdit[key]} onChange={(value) => this.onEditTime(value)}>
-                                    {this.time.slice() && this.time.slice().map((item, key) => {
-                                        return <Option value={item} key={key}>{item}</Option>
-                                    })}
-                                </Select>
+                                <Input value={item.time} disabled key={key} ></Input>
                             </Col>
                             <Col span={8} className="gutter-row">
                                 <Select
                                     mode="tags"
                                     placeholder="Please select"
-                                    value={item.fields.slice()}
+                                    value={item.keys ? item.keys.slice() : item.keys}
                                     style={{ width: '100%' }}
                                     onChange={(value) => this.onEditKey(value)}
                                     disabled={!this.enableEdit[key]}
                                 >
-                                    {this.fields.slice() && this.fields.slice().map((field, key) => {
-                                        return <Option value={field} key={key}>{field}</Option>
-                                    })}
                                 </Select>
                             </Col>
-                            <Col span={3} className="gutter-row">
-                                <Input value={item.name} disabled />
+                            <Col span={2} className="gutter-row">
+                                <Input value={item.name} disabled key={key} />
                             </Col>
-                            <Col span={5} className="gutter-row">
-                                <Button disabled={!this.enableEdit[key]} onClick={() => this.onSaveChange(key, item.name)}>保存</Button>
+                            <Col span={4} className="gutter-row">
+                                {/* <Button disabled={!this.enableEdit[key]} onClick={() => this.onSaveChange(key, item.name)}>保存</Button> */}
                                 <Button onClick={() => this.onEditSource(key, item.name)} >编辑</Button>
                                 <Button onClick={() => this.onDeleteSource(key)}>删除</Button>
                             </Col>
@@ -261,10 +446,10 @@ const confirm = Modal.confirm;
         );
     }
 
-    @action.bound onItemSave(data) {
-        this.dataSource.push(data);
-        this.enableEdit.push(false);
-    }
+    // @action.bound onItemSave(data) {
+    //     this.dataSource.push(data);
+    //     this.enableEdit.push(false);
+    // }
 
     @action onDeleteSource(key) {
         const source = this.dataSource.splice(key, 1)[0];
@@ -274,28 +459,22 @@ const confirm = Modal.confirm;
     }
 
     @action onEditSource(key, name) {
+        this.setState({
+            visibleEdit: true
+        })
         let that = this
         this.name = name
         for (var i = 0; i < this.dataSource.length; i++) {
             if (name == this.dataSource[i].name) {
                 this.data = this.dataSource[i]
+                this.data.fields = JSON.parse(this.data.fields)
             }
         }
-        confirm({
-            title: 'edit',
-            content: 'Are you sure to edit ' + name + ' ?',
-            onOk() {
-                that.enableEdit[key] = true;
-            },
-            onCancel() {
-                console.log('Cancel');
-            },
-        })
-        // this.enableEdit[key] = true;
+        console.log('data', this.data)
     }
 }
 
-export default DataSourceItem;
+export default DataSourceItem2;
 
 
 

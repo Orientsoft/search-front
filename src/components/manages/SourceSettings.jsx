@@ -10,18 +10,18 @@ import DataSourceItem from './DataSourceItem';
 const Option = Select.Option;
 
 @observer class SourceSettings extends BaseComponent {
-    @observable hide = 'none'
+    @observable hide = false
     
-    onAddData() {
-        this.hide = 'block'
+    @action.bound setVisible(visible) {
+        this.hide = visible;
     }
 
     render() {
         return (
             <Card className='dataSource'>
                 <p className='headerManager'>定义单数据源：</p>
-                <Button type="primary" icon="plus" onClick={() => this.onAddData()}>添加数据</Button>
-                <DataSourceItem add={this.hide} />
+                <Button type="primary" icon="plus" onClick={() => this.setVisible(true)}>添加数据</Button>
+                <DataSourceItem visible={this.hide} setVisible={this.setVisible} />
             </Card>
         );
     }

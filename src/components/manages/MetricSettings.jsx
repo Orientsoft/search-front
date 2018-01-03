@@ -5,23 +5,23 @@ import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import { Row, Col, Input, Button, Icon, Select, Card } from 'antd';
 import BaseComponent from '../BaseComponent';
-import MetricContent from './MetricContent';
+import MetricContent from './MetricContent2';
 
 const Option = Select.Option;
 
 @observer class MetricSetting extends BaseComponent {
-    @observable hide = 'none'
+    @observable hide = false
     
-    onAddData() {
-        this.hide = 'block'
+    @action.bound setVisible(visible) {
+        this.hide = visible;
     }
 
     render() {
         return (
             <Card className='dataSource'>
                 <p className='headerManager'>定义指标：</p>
-                <Button type="primary" icon="plus" onClick={() => this.onAddData()}>添加数据</Button>
-                <MetricContent add={this.hide} />
+                <Button type="primary" icon="plus" onClick={() => this.setVisible(true)}>添加数据</Button>
+                <MetricContent visible={this.hide} setVisible={this.setVisible} />
             </Card>
         );
     }
