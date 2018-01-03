@@ -31,60 +31,108 @@ class Topology extends BaseComponent {
                 total: -1,
                 visible: -1
             },
-            trafficData: {
-                "renderer": "global",
-                "name": "edge",
-                "nodes": [
-                  {
-                    "renderer": "region",
-                    "name": "INTERNET",
-                    "class": "normal"
-                  },
-                  {
-                    "renderer": "region",
-                    "name": "核心系统",
-                    "maxVolume": 50000,
-                    "class": "normal",
-                    "updated": 1466838546805,
-                    "nodes": [
-                      {
-                        "name": "INTERNET",
-                        "renderer": "focusedChild",
-                        "class": "normal"
-                      },
-                      {
-                        "name": "proxy-prod",
-                        "renderer": "focusedChild",
-                        "class": "normal"
-                      }
-                    ],
-                    "connections": [
-                      {
-                        "source": "INTERNET",
-                        "target": "proxy-prod",
-                        "metrics": {
-                          "danger": 116.524,
-                          "normal": 15598.906
+            styles: {
+                colorBackgroundDark: 'red'
+            },
+            definitions: {
+                detailedNode: {
+                    volume: {
+                        default: {
+                            top: {
+                                header: '指标/总指标',
+                            },
+                            bottom: {
+                                header: '错误率'
+                            },
+                            donut: {
+                                data: 'data.globalClassPercents'
+                            },
+                            arc: {
+                                data: 'metadata.data'
+                            }
                         },
-                        "class": "normal"
-                      }
-                    ]
-                  }
-                ],
-                "connections": [
-                  {
-                    "source": "INTERNET",
-                    "target": "核心系统",
-                    "metrics": {
-                      "normal": 26037.626,
-                      "danger": 1192.37
-                    },
-                    "notices": [
-                    ],
-                    "class": "normal"
-                  }
-                ]
-              },
+                        entry: {
+                            top: {
+                                header: '总指标数'
+                            }
+                        }
+                    }
+                }
+            },
+            trafficData: {
+                renderer: 'global',
+                name: 'root',
+                nodes: [{
+                    name: 'A'
+                }, {
+                    name: 'B',
+                    renderer: 'region',
+                    maxVolume: 5000,
+                    nodes: [{
+                        name: 'BA'
+                    }, {
+                        name: 'BB'
+                    }],
+                    connections: [{
+                        source: 'BA',
+                        target: 'BB'
+                    }],
+                    metadata: {
+                        data:  {
+                            values: [ // Array of values
+                                { name: 'foo', value: 30 }, // Values have a value, name, and an optional overriding class. If class is not present, uses name as class name.
+                                { name: 'bar', value: 70, class: 'barclass' }
+                            ],
+                            total: 100, // The total value to equal 100% of the arc graph
+                            line: 0.9 // [optional] What percent, in decimal form, to put the optional marking line.
+                        }
+                    }
+                }, {
+                    name: 'C',
+                    renderer: 'region',
+                    class: 'warning',
+                    maxVolume: 5000,
+                    nodes: [{
+                        name: 'CA',
+                        renderer: 'focusedChild',
+                        class: 'warning'
+                    }, {
+                        name: 'CB',
+                        renderer: 'focusedChild',
+                        class: 'warning'
+                    }],
+                    connections: [{
+                        source: 'CA',
+                        target: 'CB'
+                    }]
+                }, {
+                    name: 'D',
+                    renderer: 'region',
+                    class: 'danger'
+                }],
+                connections: [{
+                    source: 'A',
+                    target: 'B',
+                    metrics: {
+                        normal: 100,
+                        danger: 10
+                    }
+                }, {
+                    source: 'A',
+                    target: 'C',
+                    metrics: {
+                        normal: 300,
+                        danger: 100
+                    }
+                }, {
+                    source: 'A',
+                    target: 'D',
+                    metrics: {
+                        normal: 300,
+                        danger: 200
+                    }
+                }]
+            },
             regionUpdateStatus: [],
             timeOffset: 0,
             modes: {
@@ -113,6 +161,8 @@ class Topology extends BaseComponent {
                 matchesFound={this.matchesFound}
                 match={this.state.searchTerm}
                 modes={this.state.modes}
+                definitions={this.state.definitions}
+                styles={this.state.styles}
                 allowDraggingOfNodes={this.state.displayOptions.allowDraggingOfNodes} 
             />
         );
