@@ -14,9 +14,9 @@ import * as moment from 'moment';
 // ]
 
 const chartConfig = [
-    {name: '手机', fileds: {}, type: 'line', title: '中间件', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)',Xtitle: '时间' },
-    {name: '手机', fileds: {}, type: 'histogram', title: 'tploader', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)',Xtitle: '时间' },
-    {name: '手机', fileds: {}, type: 'line', title: 'DB', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)',Xtitle: '时间' },
+    { name: '手机', fileds: {}, type: 'line', title: '中间件', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
+    { name: '手机', fileds: {}, type: 'histogram', title: 'tploader', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
+    { name: '手机', fileds: {}, type: 'line', title: 'DB', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
 ]
 @observer class ReactChart extends BaseComponent {
     constructor(props, context) {
@@ -31,7 +31,7 @@ const chartConfig = [
     }
 
     @computed get data() {
-        const aggs = this.getBuckets(this.queryStore.filterFields[0]);
+        const aggs = this.getBuckets(this.queryStore.filterFields[0].field);
 
         return aggs.map(agg => this.getBuckets('@timestamp', {
             aggregations: agg
@@ -42,10 +42,12 @@ const chartConfig = [
     }
 
     render() {
+
+        console.log('data=' + this.data);
         return (
             <div className="clearfix">
                 {
-                    this.state.chartConfig.length > 0 && this.state.chartConfig.map((item, key)=>(
+                    this.state.chartConfig.length > 0 && this.data.length > 0 && this.state.chartConfig.map((item, key) => (
                         <div key={key} className="chart">
                             <div key={key} ref={el => this.initChart(el, key, this.data, item)}></div>
                         </div>
@@ -60,9 +62,12 @@ const chartConfig = [
         );
     }
     componentDidUpdate() {
-        var sync = Dygraph.synchronize(this.charts);
+        if ( this.charts.length > 0 && this.charts.length == this.state.chartConfig.length ){
+            var sync = Dygraph.synchronize(this.charts);
+        }
     }
     initChart(el, key, data, chartConfig) {
+        console.log('进入initChart');
         var chart = this.charts[key];
         if (!chart) {
             if (chartConfig.type == 'histogram') {
@@ -87,7 +92,7 @@ const chartConfig = [
                     ]
                 })
 
-            } else if (chartConfig.type == 'line'){
+            } else if (chartConfig.type == 'line') {
                 chart = new Dygraph(el, data, {
                     labels: ['x', '数量'],
                     drawGrid: false,
@@ -102,7 +107,7 @@ const chartConfig = [
                     xlabel: chartConfig.Xtitle,
                     // drawAxesAtZero: true, 
                     // includeZero: true, 
-                    strokeWidth: 2,
+                    // strokeWidth: 2,
                     // logscale: true, 
                     // labelsShowZeroValues: true, 
                     plugins: [
@@ -157,10 +162,13 @@ const chartConfig = [
     }
 
     componentDidMount() {
-        this.setState({
-            // data: this.data, 
-            chartConfig: chartConfig
-        })
+        if (this.data) {
+            this.setState({
+                // data: this.data, 
+                chartConfig: chartConfig
+            })
+        }
+
     }
 
 }

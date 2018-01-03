@@ -9,12 +9,11 @@ import { dateHistogram, terms as termsAgg } from '../queries/core/BucketAggregat
  * 只定义需要共享的查询参数，不需要作为查询参数的应该在AppStore里定义
  */
 export class QueryStore {
-    metadata = {};
-
     constructor() {
         extendObservable(this, {
             // 当前激活索引
             index: ['mobile-weblogic-jvm-*'],
+            size: 101,
             // 过滤字段
             filterFields: [{
                 field: 'message.msg.ThreadActiveCount',
@@ -33,7 +32,7 @@ export class QueryStore {
         const filterField = this.filterFields[0];
         const body = new RequestBody().add(termsQuery({
             [filterField.field]: [].concat(filterField.value)
-        }));
+        })).size(this.size);
 
         return body.add(termsAgg(filterField.field, {
             field: filterField.field
@@ -54,7 +53,7 @@ export class QueryStore {
         
         return new RequestBody().from(from).add(termsQuery({
             [filterField.field]: [].concat(filterField.value)
-        }));
+        })).size(this.size);
     }
 }
 
