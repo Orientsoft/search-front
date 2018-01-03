@@ -400,7 +400,7 @@ const FormItem = Form.Item;
                 >
                     {editForm}
                 </Modal>
-                <Row gutter={16}>
+                <Row gutter={5}>
                     <Col span={2} className="gutter-row">类型:</Col>
                     <Col span={5} className="gutter-row">数据源:</Col>
                     <Col span={3} className="gutter-row">时间:</Col>
@@ -410,7 +410,7 @@ const FormItem = Form.Item;
 
                 <div className='contentManager'>
                     {this.dataSource.slice().map((item, key) => {
-                        return (<Row gutter={16} key={key}>
+                        return (<Row gutter={5} key={key}>
                             <Col span={2} className="gutter-row">
                                 <Input value={item.category} disabled key={key} ></Input>
                             </Col>

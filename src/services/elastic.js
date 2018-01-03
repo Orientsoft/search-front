@@ -138,6 +138,39 @@ export default {
 
         return client.search(query).catch(throwQueryError('search()'));
     },
+    // 保存指标配置
+    saveMetricDataSource: (name, data) => {
+        return client.create({
+            index: 'query',
+            type: 'metric',
+            id: Buffer.from(name).toString('base64'),
+            body: data
+        }).catch(throwQueryError('saveMetricDataSource()'));
+    },
+    // 获取指标配置
+    getmetricDataSource: (name) => {
+        let query = {
+            index: 'query',
+            type: 'metric'
+        };
+
+        if (name) {
+            query = Object.assign(query, {
+                id: Buffer.from(name).toString('base64')
+            });
+        }
+
+        return client.search(query).catch(throwQueryError('search()'));
+    },
+    // 删除指标配置
+    deleteMetricDataSource: (name) => {
+        return client.delete({
+            index: 'query',
+            type: 'metric',
+            id: Buffer.from(name).toString('base64')
+        }).catch(throwQueryError('deleteMetricDataSource()'));
+    },
+
 
     // 修改单数据源
     updateSingleDataSource: (name, data) => {
@@ -160,6 +193,17 @@ export default {
                 doc: data
             }
         }).catch(throwQueryError('updateMultipleDataSource()'));
+    },
+    // 修改指标
+    updateMetricDataSource: (name, data) => {
+        return client.update({
+            index: 'query',
+            type: 'metric',
+            id: Buffer.from(name).toString('base64'),
+            body: {
+                doc: data
+            }
+        }).catch(throwQueryError('updateMetricDataSource()'));
     }
 
 };
