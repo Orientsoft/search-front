@@ -1,6 +1,14 @@
 import React from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 import Vizceral from '../libs/Vizceral';
 import BaseComponent from './BaseComponent';
+
+const rootNode = {
+    renderer: 'global',
+    name: 'root',
+    nodes: [],
+    connections: []
+};
 
 class Topology extends BaseComponent {
     constructor(props) {
@@ -59,80 +67,7 @@ class Topology extends BaseComponent {
                     }
                 }
             },
-            trafficData: {
-                renderer: 'global',
-                name: 'root',
-                nodes: [{
-                    name: 'A'
-                }, {
-                    name: 'B',
-                    renderer: 'region',
-                    maxVolume: 5000,
-                    nodes: [{
-                        name: 'BA'
-                    }, {
-                        name: 'BB'
-                    }],
-                    connections: [{
-                        source: 'BA',
-                        target: 'BB'
-                    }],
-                    metadata: {
-                        data:  {
-                            values: [ // Array of values
-                                { name: 'foo', value: 30 }, // Values have a value, name, and an optional overriding class. If class is not present, uses name as class name.
-                                { name: 'bar', value: 70, class: 'barclass' }
-                            ],
-                            total: 100, // The total value to equal 100% of the arc graph
-                            line: 0.9 // [optional] What percent, in decimal form, to put the optional marking line.
-                        }
-                    }
-                }, {
-                    name: 'C',
-                    renderer: 'region',
-                    class: 'warning',
-                    maxVolume: 5000,
-                    nodes: [{
-                        name: 'CA',
-                        renderer: 'focusedChild',
-                        class: 'warning'
-                    }, {
-                        name: 'CB',
-                        renderer: 'focusedChild',
-                        class: 'warning'
-                    }],
-                    connections: [{
-                        source: 'CA',
-                        target: 'CB'
-                    }]
-                }, {
-                    name: 'D',
-                    renderer: 'region',
-                    class: 'danger'
-                }],
-                connections: [{
-                    source: 'A',
-                    target: 'B',
-                    metrics: {
-                        normal: 100,
-                        danger: 10
-                    }
-                }, {
-                    source: 'A',
-                    target: 'C',
-                    metrics: {
-                        normal: 300,
-                        danger: 100
-                    }
-                }, {
-                    source: 'A',
-                    target: 'D',
-                    metrics: {
-                        normal: 300,
-                        danger: 200
-                    }
-                }]
-            },
+            trafficData: rootNode,
             regionUpdateStatus: [],
             timeOffset: 0,
             modes: {
@@ -144,6 +79,50 @@ class Topology extends BaseComponent {
     objectHighlightedFunc = (highlightedObject) => {
         // need to set objectToHighlight for diffing on the react component. since it was already highlighted here, it will be a noop
         this.setState({ highlightedObject: highlightedObject, objectToHighlight: highlightedObject ? highlightedObject.getName() : undefined, searchTerm: '', matches: { total: -1, visible: -1 }, redirectedFrom: undefined });
+    }
+
+    componentWillMount() {
+        this.elastic.getNodes().then(result => {
+            const nodes = this.getHits(result).map(data => data._source);
+
+            this.setState({
+                trafficData: nodes.reduce((graph, node) => {
+                    if (node.level === 1) {
+                        const _node = {
+                            name: node.src,
+                            renderer: 'region',
+                            maxVolume: 10000
+                        };
+                        if (node.nodes) {
+                            _node.nodes = node.nodes.map(child => {
+                                return {
+                                    name: child.src,
+                                    renderer: 'focusedChild'
+                                };
+                            });
+                            _node.connections = node.nodes.map(child => {
+                                return {
+                                    src: child.src,
+                                    target: child.target,
+                                    metrics: {
+                                        normal: 200
+                                    }
+                                };
+                            });
+                        }
+                        graph.nodes.push(_node);
+                        graph.connections.push({
+                            src: node.src,
+                            target: node.target,
+                            metrics: {
+                                normal: 500
+                            }
+                        });
+                    }
+                    return graph;
+                }, cloneDeep(rootNode))
+            });
+        });
     }
 
     render() {
