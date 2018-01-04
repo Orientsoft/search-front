@@ -15,19 +15,15 @@ const FormItem = Form.Item;
     @observable.ref fields = []
     @observable.ref metrics = []
     @observable dataSources = []
-    @observable dataSourcesForShow = []
     @observable enableEdit = []
-    @observable editdata = {name: '', sources: [], metrics: []}
 
     @observable originname = ''
     @observable originSources = []
     @observable originMetrics = []
 
     // 需要提交保存的数据
-    // data = {}
     data2 = { name: '', sources: [], metrics: [] }
     name = ''
-    metric = []
     constructor(props) {
         super(props)
         this.state = {
@@ -38,30 +34,16 @@ const FormItem = Form.Item;
 
     componentWillMount() {
         this.elastic.getMultipleDataSource().then(result => {
-            let dataSources = get(result, 'hits.hits', []).map(data => data._source);
-            this.dataSources = dataSources
-            this.appStore.multipleDataNames = get(result, 'hits.hits', []).map(data => data._source.name);
-            this.enableEdit = Array(dataSources.length);
-            console.log('datasources', dataSources.slice())
-
-            //展示数据
-            for (let key in dataSources.slice()) {
-                let name = dataSources[key].name
-                let sources = dataSources[key].sources[0].name
-                // this.dataSources[key]['sources'] = sources
-                let metrics = dataSources[key].metrics
-                let allmetricname = []
-                for (let j in metrics.slice()) {
-                    let metricname = metrics[j].name
-                    allmetricname.push(metricname)
-                }
-                let obj = { name: name, sources: sources, metrics: allmetricname }
-                this.dataSourcesForShow.push(obj)
+            let data = get(result, 'hits.hits', []).map(data => data._source);
+            let all = []
+            for (let key in data) {
+                all.push(JSON.parse(data[key].data))
             }
-            
+            this.dataSources = all
+            this.appStore.multipleDataNames = get(result, 'hits.hits', []).map(data => data._source.name);
+            this.enableEdit = Array(this.dataSources.length);
         });
 
-        // this.fields = this.appStore.singleDataNames
         this.elastic.getSingleDataSource().then(result => {
             this.fields = get(result, 'hits.hits', []).map(data => data._source.name);
             // this.enableEdit = Array(this.dataSources.length);
@@ -72,7 +54,6 @@ const FormItem = Form.Item;
                 let name = JSON.parse(metrics[key]).name
                 this.metrics.push(name)
             }
-            // this.enableEdit = Array(this.dataSources.length);
         });
     }
     componentWillReceiveProps(nextProps) {
@@ -82,65 +63,39 @@ const FormItem = Form.Item;
     }
 
     onNameChange(value) {
-        // this.data.name = value;
         this.data2.name = value;
         this.originname = value
     }
 
     onKeyChange(value) {
-        let arr = [{ name: value }]
-        // this.data.fields = value;
-        this.data2.sources = arr
+        this.data2.sources = value
         this.originSources = value
     }
 
     onMetricChange(value) {
         this.originMetrics = value
-        this.metric = value
-        console.log('metric', value)
+        this.data2.metrics = value
     }
 
     onEditKey(value) {
-        let arr = [{ name: value }]
-        this.editdata.sources = value
-        // this.data.fields = value;
-        this.data2.sources = arr
+        this.data2.sources = value
     }
 
     onEditMetric(value) {
-        this.editdata.metrics = value
-        this.metric = value
-        console.log('metric', this.metric)
+        this.data2.metrics = value
     }
 
     onSave() {
-        console.log('save',this.metric)
         this.props.setVisible(false)
-        for (let key in this.metric) {
-            let obj = { name: this.metric[key] }
-            this.data2.metrics.push(obj)
-        }
-        this.elastic.saveMultipleDataSource(this.data2.name, this.data2);
+        this.elastic.saveMultipleDataSource(this.data2.name, {
+            data:JSON.stringify(this.data2)
+        });
         this.dataSources.push(this.data2)
 
-        let name = this.data2.name
-        let sources = this.data2.sources[0].name
-        let metrics = this.data2.metrics
-        let allmetricname = []
-        for (let j in metrics.slice()) {
-            let metricname = metrics[j].name
-            allmetricname.push(metricname)
-        }
-        let obj = { name: name, sources: sources, metrics: allmetricname }
-        this.dataSourcesForShow.push(obj)
-
-        // this.props.onSave(this.data);
-        // this.dataSources.push(this.data2);
         this.enableEdit.push(false);
         this.originSources = [];
         this.originname = '';
         this.originMetrics = [];
-        this.metric = [];
         this.data2 = { name: '', sources: [], metrics: [] };
         this.appStore.multipleDataNames.push(this.data2.name);
     }
@@ -152,33 +107,19 @@ const FormItem = Form.Item;
         this.setState({
             visibleEdit: false
         })
-        for (let key in this.metric) {
-            let obj = { name: this.metric[key] }
-            this.data2.metrics.push(obj)
-        }
-        this.elastic.updateMultipleDataSource(this.data2.name, this.data2);
+        this.elastic.updateMultipleDataSource(this.data2.name, {
+            data:JSON.stringify(this.data2)
+        });
 
-        let name = this.data2.name
-        let sources = this.data2.sources[0].name
-        let metrics = this.data2.metrics
-        let allmetricname = []
-        for (let j in metrics.slice()) {
-            let metricname = metrics[j].name
-            allmetricname.push(metricname)
-        }
-        let obj = { name: name, sources: sources, metrics: allmetricname }
-        for (var i = 0; i < this.dataSourcesForShow.length; i++) {
-            if (name == this.dataSources[i].name) {
-                this.dataSourcesForShow[i] = obj
-            }
-        }
         for (var i = 0; i < this.dataSources.length; i++) {
             if (name == this.dataSources[i].name) {
                 this.dataSources[i] = this.data2
             }
         }
         this.enableEdit[key] = false;
+        this.data2 = {}
     }
+
     onCancelEdit() {
         this.setState({
             visibleEdit: false
@@ -225,13 +166,13 @@ const FormItem = Form.Item;
 
         let editForm = <Form horizonal='true' >
         <FormItem {...formItemLayout} label='名称:'>
-            <Input onChange={(e) => this.onNameChange(e.target.value)} value={this.editdata.name} />
+            <Input onChange={(e) => this.onNameChange(e.target.value)} value={this.data2.name} disabled/>
         </FormItem>
         <FormItem {...formItemLayout} label='数据源:'>
             <Select
                 mode="tags"
                 placeholder="Please select"
-                value={this.editdata.sources ? this.editdata.sources.slice() : this.editdata.sources}
+                value={this.data2.sources ? this.data2.sources.slice() : this.data2.sources}
                 style={{ width: '100%' }}
                 onChange={(value) => this.onEditKey(value)}
             >
@@ -244,7 +185,7 @@ const FormItem = Form.Item;
             <Select
                 mode="tags"
                 placeholder="Please select"
-                value={this.editdata.metrics ? this.editdata.metrics.slice() :this.editdata.metrics}
+                value={this.data2.metrics ? this.data2.metrics.slice() :this.data2.metrics}
                 style={{ width: '100%' }}
                 onChange={(value) => this.onEditMetric(value)}
             >
@@ -281,7 +222,7 @@ const FormItem = Form.Item;
                 </div>
 
                 <div className='contentManager'>
-                    {this.dataSourcesForShow.slice().map((item, key) => {
+                    {this.dataSources.slice().map((item, key) => {
                         return (<Row key={key} gutter={16}>
                             <Col span={4} className="gutter-row">
                                 <Input value={item.name} disabled />
@@ -327,15 +268,8 @@ const FormItem = Form.Item;
         );
     }
 
-    @action.bound onItemSave(data) {
-        this.dataSources.push(data);
-        this.enableEdit.push(false);
-    }
-
     @action onDeleteSource(key) {
-        console.log('key',key)
         const source = this.dataSources.splice(key, 1)[0];
-        this.dataSourcesForShow.splice(key, 1)[0];
         this.enableEdit[key] = false;
         this.elastic.deleteMultipleDataSource(source.name);
         this.appStore.multipleDataNames.splice(key, 1);
@@ -346,14 +280,6 @@ const FormItem = Form.Item;
             visibleEdit: true
         })
         this.name = name
-        console.log('name', name)
-
-        for (var i = 0; i < this.dataSourcesForShow.length; i++) {
-            if (name == this.dataSourcesForShow[i].name) {
-                this.editdata = this.dataSourcesForShow[i]
-                console.log('this.editdata',this.editdata)
-            }
-        }
         for (var i = 0; i < this.dataSources.length; i++) {
             if (name == this.dataSources[i].name) {
                 this.data2 = this.dataSources[i]
