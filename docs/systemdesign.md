@@ -8,24 +8,35 @@
         |-- TimeRange
         |-- Topology
             |-- Config
+<<<<<<< HEAD
                 |-- definitions
+=======
+>>>>>>> d8863459a0bce817b49b553a44c93249b70722ec
             |-- Topo
                 |-- node[]
                 |-- connections[]
         |-- KPI
+<<<<<<< HEAD
             |-- Type
+=======
+>>>>>>> d8863459a0bce817b49b553a44c93249b70722ec
             |-- Query
             |-- Chart
         |-- Alert
             |-- Reactor
             |-- Query
         |-- Table
+<<<<<<< HEAD
             |-- DataSouce // 数据源
+=======
+            |-- DataSouce
+>>>>>>> d8863459a0bce817b49b553a44c93249b70722ec
             |-- TableResult
         |-- DataSouce
             |-- Config
             |-- Query
             |-- Result
+<<<<<<< HEAD
 
 ### Obj JSON
 
@@ -83,6 +94,15 @@ Alert: {
     level：告警层级
 }
 ```
+=======
+    - Query
+        |-- TimeRange
+        |-- Index
+        |-- Filter
+        |-- QueryText
+    - 
+
+>>>>>>> d8863459a0bce817b49b553a44c93249b70722ec
 
 ## Logical relationship
 

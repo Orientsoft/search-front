@@ -150,7 +150,7 @@ export default {
         }).catch(throwQueryError('saveMetricDataSource()'));
     },
     // 获取指标配置
-    getmetricDataSource: (name) => {
+    getMetricDataSource: (name) => {
         let query = {
             index: 'query',
             type: 'metric'
@@ -206,6 +206,28 @@ export default {
                 doc: data
             }
         }).catch(throwQueryError('updateMetricDataSource()'));
-    }
+    },
+    // 获取拓扑配置
+    getNodes: (name) => {
+        let query = {
+            index: 'query',
+            type: 'nodes'
+        };
 
+        if (name) {
+            query = Object.assign(query, {
+                id: Buffer.from(name).toString('base64')
+            });
+        }
+
+        return client.search(query).catch(throwQueryError('getNodes()'));
+    },
+    saveNode: (name, data) => {
+        return client.create({
+            index: 'query',
+            type: 'nodes',
+            id: Buffer.from(name).toString('base64'),
+            body: data
+        }).catch(throwQueryError('saveNode()'));
+    }
 };
