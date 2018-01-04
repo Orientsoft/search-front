@@ -5,7 +5,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import { Row, Col, Input, Button, Icon, Select, Card } from 'antd';
 import BaseComponent from '../BaseComponent';
-import MetricContent from './MetricContent2';
+import MetricContent from './MetricContent';
 
 const Option = Select.Option;
 

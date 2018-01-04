@@ -11,16 +11,20 @@ const { SubMenu } = Menu;
 
 @observer class LeftSidebar extends BaseComponent {
     singledataNames = ['db', 'weblogic', 'tuxedo', '业务', '系统']
+    @observable selectedName = ''
 
     componentWillMount() {
         this.elastic.getMultipleDataSource().then(result => {
             this.appStore.multipleDataNames = get(result, 'hits.hits', []).map(data => data._source.name);
-            this.appStore.singleDataType = this.singledataNames[0]
+            // this.appStore.singleDataType = this.singledataNames[0]
+            // this.selectedName = this.appStore.multipleDataNames[0]
+            // console.log('this.selectedName',this.selectedName)
         });
-
     }
-    onMenuChange (e,key){
-       this.appStore.singleDataType = e
+    onMenuChange (e){
+        this.selectedName = e.target.dataset.name
+        console.log('sss',e.target.dataset.name)
+    //    this.appStore.singleDataType = e
     }
     
 
@@ -38,7 +42,7 @@ const { SubMenu } = Menu;
                         <Menu.Item key="1" className="searchManage">查询</Menu.Item>
                         <SubMenu key="sub1" title={<span>系统查询</span>}>
                             {this.appStore.multipleDataNames.map((item, key) => {
-                                return (<Menu.Item key={key}><Link to="/core">{item}</Link></Menu.Item>)
+                                return (<Menu.Item key={key} ><Link to="/core">{item}</Link></Menu.Item>)
                             })}
                         </SubMenu>
                        
