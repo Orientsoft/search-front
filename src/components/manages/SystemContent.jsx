@@ -21,7 +21,7 @@ const FormItem = Form.Item;
     @observable originSources = []
     @observable originMetrics = []
 
-    // 需要提交保存的数据
+    // 需要提交的数据
     data2 = { name: '', sources: [], metrics: [] }
     name = ''
     constructor(props) {
@@ -48,7 +48,7 @@ const FormItem = Form.Item;
             this.fields = get(result, 'hits.hits', []).map(data => data._source.name);
             // this.enableEdit = Array(this.dataSources.length);
         });
-        this.elastic.getmetricDataSource().then(result => {
+        this.elastic.getMetricDataSource().then(result => {
             let metrics = get(result, 'hits.hits', []).map(data => data._source.data);
             for (let key in metrics) {
                 let name = JSON.parse(metrics[key]).name

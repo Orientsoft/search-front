@@ -37,7 +37,7 @@ const FormItem = Form.Item;
         }
     }
     componentWillMount() {
-        this.elastic.getmetricDataSource().then(result => {
+        this.elastic.getMetricDataSource().then(result => {
             let data = get(result, 'hits.hits', []).map(data => data._source);
             for (let key in data) {
                 this.dataSource[key] = JSON.parse(data[key].data)
