@@ -150,7 +150,7 @@ export default {
         }).catch(throwQueryError('saveMetricDataSource()'));
     },
     // 获取指标配置
-    getmetricDataSource: (name) => {
+    getMetricDataSource: (name) => {
         let query = {
             index: 'query',
             type: 'metric'

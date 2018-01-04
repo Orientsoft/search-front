@@ -10,19 +10,31 @@ const { Sider } = Layout;
 const { SubMenu } = Menu;
 
 @observer class LeftSidebar extends BaseComponent {
-    singledataNames = ['db', 'weblogic', 'tuxedo', '业务', '系统']
-
     componentWillMount() {
-        this.elastic.getMultipleDataSource().then(result => {
-            this.appStore.multipleDataNames = get(result, 'hits.hits', []).map(data => data._source.name);
-            this.appStore.singleDataType = this.singledataNames[0]
-        });
+        // 获取所有系统
+        this.elastic.getMultipleDataSource().then(action(result => {
+            this.appStore.config.systems = this.getHits(result).map(data => JSON.parse(data._source.data));
+        }));
+        // 获取所有指标
+        this.elastic.getMetricDataSource().then(result => {
+            this.appStore.config.metrics = this.getHits(result).map(data => JSON.stringify(data._source.data));
+       });
+    }
 
-    }
     onMenuChange (e,key){
-       this.appStore.singleDataType = e
+       const system = this.appStore.config.systems[key];
+       let metrics = [];
+
+       this.appStore.selectedConfig.system = system;
+       for (let i = 0; i < system.metrics.length; i++) {
+           const _metrics = this.appStore.config.metrics.filter(metric => metric.name === system.metrics[i]);
+
+           if (_metrics) {
+               metrics = metrics.concat(_metrics);
+           }
+       }
+       this.appStore.selectedConfig.metrics = metrics;
     }
-    
 
     render() {
         return (
@@ -37,8 +49,8 @@ const { SubMenu } = Menu;
                     <SubMenu key="top02" title="数据分析">
                         <Menu.Item key="1" className="searchManage">查询</Menu.Item>
                         <SubMenu key="sub1" title={<span>系统查询</span>}>
-                            {this.appStore.multipleDataNames.map((item, key) => {
-                                return (<Menu.Item key={key}><Link to="/core">{item}</Link></Menu.Item>)
+                            {this.appStore.config.systems.map((system, key) => {
+                                return (<Menu.Item key={key}><Link to="/core">{system.name}</Link></Menu.Item>)
                             })}
                         </SubMenu>
                        
