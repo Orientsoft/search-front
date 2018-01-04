@@ -2,6 +2,7 @@ import { observable, extendObservable } from 'mobx';
 import * as moment from 'moment';
 import RequestBody from '../queries/RequestBody';
 import { terms as termsQuery } from '../queries/core/TermQuery';
+import { bool as boolQuery } from '../queries/core/CompoundQuery';
 import { dateHistogram, terms as termsAgg } from '../queries/core/BucketAggregation';
 
 /**
@@ -18,6 +19,9 @@ export class QueryStore {
             filterFields: [{
                 field: 'message.msg.ThreadActiveCount',
                 value: 5
+            }, {
+                field: 'message.msg.Uptime',
+                value: 4314326
             }],
             // 日期格式
             momentFormat: 'YYYY-MM-DD HH:mm:ss',
@@ -29,31 +33,45 @@ export class QueryStore {
     }
 
     buildSearch() {
-        const filterField = this.filterFields[0];
-        const body = new RequestBody().add(termsQuery({
-            [filterField.field]: [].concat(filterField.value)
-        })).size(this.size);
+        const body = new RequestBody().size(this.size);
+        const query = boolQuery({
+            should: []
+        });
 
-        return body.add(termsAgg(filterField.field, {
-            field: filterField.field
-        }).with(dateHistogram('@timestamp', {
-            field: '@timestamp',
-            format: 'yyyy-MM-dd',
-            interval: 'day',
-            min_doc_count: 0,
-            extended_bounds: {
-                min: this.startMoment.format('YYYY-MM-DD'),
-                max: this.endMoment.format('YYYY-MM-DD')
-            }
-        })));
+        this.filterFields.forEach((filterField) => {
+            query.body.bool.should.push(termsQuery({
+                [filterField.field]: [].concat(filterField.value)
+            }).toJSON());
+            body.add(termsAgg(filterField.field, {
+                field: filterField.field
+            }).with(dateHistogram('@timestamp', {
+                field: '@timestamp',
+                format: 'yyyy-MM-dd',
+                interval: 'day',
+                min_doc_count: 0,
+                extended_bounds: {
+                    min: this.startMoment.format('YYYY-MM-DD'),
+                    max: this.endMoment.format('YYYY-MM-DD')
+                }
+            })));
+        });
+
+        return body.add(query);
     }
 
     buildPagination(from = 0) {
-        const filterField = this.filterFields[0];
-        
-        return new RequestBody().from(from).add(termsQuery({
-            [filterField.field]: [].concat(filterField.value)
-        })).size(this.size);
+        const body = new RequestBody().size(this.size).from(from);
+        const query = boolQuery({
+            should: []
+        });
+
+        this.filterFields.forEach((filterField) => {
+            query.body.bool.should.push(termsQuery({
+                [filterField.field]: [].concat(filterField.value)
+            }).toJSON());
+        });
+
+        return body.add(query);
     }
 }
 
