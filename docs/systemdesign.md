@@ -1,6 +1,6 @@
 # System Design
 
-## System Object
+## System Architect
 
 ### Object Level
 
@@ -9,78 +9,113 @@
         |-- Topology
             |-- Config
                 |-- definitions
-            |-- Topo
+            |-- DataSource
+            |-- TopoData
                 |-- node[]
                 |-- connections[]
         |-- KPI
-            |-- Type
-            |-- Query
+            |-- Config
+            |-- DataSource
             |-- Chart
         |-- Alert
             |-- Reactor
-            |-- Query
+            |-- DataSource
         |-- Table
             |-- DataSouce // 数据源
             |-- TableResult
-        |-- DataSouce
-            |-- Config
-            |-- Query
-            |-- Result
 
-### Obj JSON
+### Obj JSON Definition
 
-```js
-KPI: {
-    name: 指标名称,
-    source: 数据源,
-    fields: [                   // 列出数据源中配置的字段
-        {
-            field: SrcIp,       // 在数据源配置中选择的字段
-            value: 192.168.0.1  // 搜索的值
-        }
-    ],
-    chart: {
-        title: 图表标题,
-        type: line,
-        x: {
-            field: source.timestamp,
-            label: 时间
-        },
-        y: {
-            field: DstIp,
-            label: 目标地址
-        }
-    }
+```json
+
+Query:{
+    index: "index-**",          // ES index
+    tsrange: globe.tsrange,     // 全局的查询时间段约束条件
+    filter: [],                 // 可以继承上层调用，自动引入DataSouce的条件过滤器
+    QueryContext: “aaaa”,       //ES 查询语句
 }
 
 DataSource: {
-    name: 数据源名称,
-    type: 业务类型,
-    index: demo-*, // ES查询索引
-    timestamp: @timestamp, //和x轴关联的时间字段
-    fields: [{
-       field: SrcIp,
-       label: 中文名字
-    }] //查询的字段
+    Config:{
+        Name: "数据源名称",
+        Type: "类型",            // B:业务, A:异常告警, MW:中间件, DB: 数据库, OS: 操作系统, NET: 网络
+        Subtype: "数据源子类型",  // 子类型可来自结果集指定字段 业务名称，
+                                //      Tux/WLS/TC/, MySQL/ORACLE/DB2/Informix,
+                                //      AIX/Linux, Switch/Router/npm
+        timestamp: ts,          // 和x轴关联的时间字段
+        SelectFields: [{        // 查询选取的字段
+            field: SrcIp,
+            label: 中文名字
+        }]
+        ResultFields:[{         // 结果选取的字段
+            field: meta_field,
+            label: 中文名字
+        }],
+
+    }
+    MetaDataFilter:[]           // 数据源中的源数据过滤器 schema
+    Query:                      // 继承的Query对象
+    Result:{
+        Query.rs                // 通过
+    }
 }
 
+KPI: {
+    Config:{
+        Name: 指标名称,
+        Desc: 指标描述,
+        Chart: {
+            title: 图表标题,
+            type: line,
+            style: chart.style, //Chart Style
+            x: {
+                field: source.timestamp,
+                label: 时间
+            },
+            y: [{
+                field: DstIp,
+                label: 目标地址
+            }]
+        }
+    }
+    DataSource: this.DataSouce,         // 组装的Query对象
+    Chart: {                            // 生成的Chart对象
+        data: this.DataSouce.Result     // 当前绑定DataSource的返回
+    }
+}
+
+// 还需要完善
 Topo: {
     src: 当前节点名,
     target: 目标节点名,
-    level: 1,   // 一级节点还是二级节点 1: 一级节点 2: 二级节点
-    nodes: [],  // 子节点,可嵌套
+    level: 1,                           // 一级节点还是二级节点 1: 一级节点 2: 二级节点
+    nodes: [],                          // 子节点,可嵌套
     metrics: {
-        normal: 0,  // 绿色
-        warning: 0, // 黄色
-        danger: 0   // 绿色
-    }           //拓扑图指标
+        normal: 0,                      // 绿色
+        warning: 0,                     // 黄色
+        danger: 0                       // 绿色
+    }                                   //拓扑图指标
 }
 
+// 还需要完善
 Alert: {
-    name：告警名字，
-    startts：起始时间，
-    endts：结束时间，
-    level：告警层级
+    ts:发生时间
+    name:告警名字，
+    description:告警描述，
+    level:告警层级，
+    startts:起始时间，
+    endts:结束时间，
+    type: {simple,ml}                   // simple: 人工定义， ml:机器学习定义
+    value:                              // 发生值
+    lowerBound:                         // 低线
+    upperBound:                         // 高线
+    anomIndex:                          // 异常数据源
+    residual:
+    estimate:
+    gesdTestResult (true|false)
+    boundTestResult (true|false)
+    severity
+    alertExplain
 }
 ```
 
