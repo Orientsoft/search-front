@@ -15,7 +15,20 @@ export class AppStore {
             singleDataNames: [],
             multipleDataNames: [],
             singleDataType: '',
-            singleDatas: []
+            singleDatas: [],
+            config: {
+                sources: {},
+                // 所有指标
+                metrics: [],
+                // 所有系统
+                systems: []
+            },
+            // 当前选择的系统和指标
+            selectedConfig: {
+                system: null,
+                metrics: [],
+                sources: []
+            }
         });
     }
 }

@@ -55,7 +55,6 @@ const FormItem = Form.Item;
                 }
                 this.dataSource[key].fieldShow = allshow
             }
-            console.log('ddd', this.dataSource.slice())
         })
         this.elastic.getSingleDataSource().then(result => {
             this.setState({
