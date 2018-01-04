@@ -37,7 +37,7 @@ const FormItem = Form.Item;
         }
     }
     componentWillMount() {
-        this.elastic.getmetricDataSource().then(result => {
+        this.elastic.getMetricDataSource().then(result => {
             let data = get(result, 'hits.hits', []).map(data => data._source);
             for (let key in data) {
                 this.dataSource[key] = JSON.parse(data[key].data)
@@ -55,7 +55,6 @@ const FormItem = Form.Item;
                 }
                 this.dataSource[key].fieldShow = allshow
             }
-            console.log('ddd', this.dataSource.slice())
         })
         this.elastic.getSingleDataSource().then(result => {
             this.setState({
