@@ -1,30 +1,26 @@
 import React from 'react';
 import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
-import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
-import { Row, Col, Input, Button, Icon, Select, Card } from 'antd';
+import { Button, Card } from 'antd';
 import BaseComponent from '../BaseComponent';
-import DataSourceItem from './DataSourceItem';
+import TopologyContent from './TopologyContent';
 
-const Option = Select.Option;
-
-@observer class SourceSettings extends BaseComponent {
-    @observable hide = 'none'
+@observer class TopologySettings extends BaseComponent {
+    @observable hide = false
     
-    onAddData() {
-        this.hide = 'block'
+    @action.bound setVisible(visible) {
+        this.hide = visible;
     }
 
     render() {
         return (
             <Card className='dataSource'>
-                <p className='headerManager'>定义单数据源：</p>
-                <Button type="primary" icon="plus" onClick={() => this.onAddData()}>添加数据</Button>
-                <DataSourceItem add={this.hide} />
+                <p className='headerManager'>定义拓扑：</p>
+                <Button type="primary" icon="plus" onClick={() => this.setVisible(true)}>添加数据</Button>
+                <TopologyContent visible={this.hide} setVisible={this.setVisible} />
             </Card>
         );
     }
 }
 
-export default SourceSettings;
+export default TopologySettings;
