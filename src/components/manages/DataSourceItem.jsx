@@ -470,7 +470,6 @@ const FormItem = Form.Item;
                 this.data.fields = JSON.parse(this.data.fields)
             }
         }
-        console.log('data', this.data)
     }
 }
 
