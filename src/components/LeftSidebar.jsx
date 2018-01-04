@@ -1,5 +1,5 @@
 import React from 'react';
-import { observable, computed, action } from 'mobx';
+import mobx, { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
 import get from 'lodash/get';
 import { Link } from 'react-router-dom'
@@ -17,11 +17,18 @@ const { SubMenu } = Menu;
         }));
         // 获取所有指标
         this.elastic.getMetricDataSource().then(result => {
-            this.appStore.config.metrics = this.getHits(result).map(data => JSON.stringify(data._source.data));
+            this.appStore.config.metrics = this.getHits(result).map(data => JSON.parse(data._source.data));
+       });
+       // 获取所有数据源
+       this.elastic.getSingleDataSource().then(result => {
+            this.appStore.config.sources = this.getHits(result).reduce((sources, data) => {
+                sources[data._source.name] = JSON.parse(data._source.fields)
+                return sources;
+            }, {});
        });
     }
 
-    onMenuChange (e,key){
+    onMenuChanged({ item, key }){
        const system = this.appStore.config.systems[key];
        let metrics = [];
 
@@ -29,11 +36,13 @@ const { SubMenu } = Menu;
        for (let i = 0; i < system.metrics.length; i++) {
            const _metrics = this.appStore.config.metrics.filter(metric => metric.name === system.metrics[i]);
 
-           if (_metrics) {
+           if (_metrics.length) {
                metrics = metrics.concat(_metrics);
            }
        }
        this.appStore.selectedConfig.metrics = metrics;
+       this.appStore.selectedConfig.sources = system.sources.map(source => this.appStore.config.sources[source]);
+       console.log('selected config: ', mobx.toJS(this.appStore.selectedConfig));
     }
 
     render() {
@@ -42,7 +51,7 @@ const { SubMenu } = Menu;
                 <div className="logo">
                     <span>大数据智能运维平台</span>
                 </div>
-                <Menu mode="inline" theme="dark">
+                <Menu mode="inline" theme="dark" onClick={(item) => this.onMenuChanged(item)}>
                     <SubMenu key="top01" title="系统拓扑">
                         <Menu.Item key="topology" className="topology"><Link to="/topology">拓扑分析</Link></Menu.Item>
                     </SubMenu>
