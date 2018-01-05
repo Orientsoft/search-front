@@ -40,7 +40,7 @@ const FormItem = Form.Item;
                 all.push(JSON.parse(data[key].data))
             }
             this.dataSources = all
-            this.appStore.multipleDataNames = get(result, 'hits.hits', []).map(data => data._source.name);
+            this.appStore.config.systems = all
             this.enableEdit = Array(this.dataSources.length);
         });
 
@@ -56,6 +56,7 @@ const FormItem = Form.Item;
             }
         });
     }
+
     componentWillReceiveProps(nextProps) {
         this.setState({
             visible: nextProps.visible
@@ -91,13 +92,14 @@ const FormItem = Form.Item;
             data:JSON.stringify(this.data2)
         });
         this.dataSources.push(this.data2)
+        this.appStore.config.systems.push(this.data2);
+        console.log("this.appStore.config.systems",this.appStore.config.systems)
 
         this.enableEdit.push(false);
         this.originSources = [];
         this.originname = '';
         this.originMetrics = [];
         this.data2 = { name: '', sources: [], metrics: [] };
-        this.appStore.multipleDataNames.push(this.data2.name);
     }
     onCancel(){
         this.props.setVisible(false)
@@ -272,7 +274,8 @@ const FormItem = Form.Item;
         const source = this.dataSources.splice(key, 1)[0];
         this.enableEdit[key] = false;
         this.elastic.deleteMultipleDataSource(source.name);
-        this.appStore.multipleDataNames.splice(key, 1);
+         //this.appStore.multipleDataNames.splice(key, 1);
+         this.appStore.config.systems.splice(key, 1);
     }
 
     @action onEditSource(key, name) {
