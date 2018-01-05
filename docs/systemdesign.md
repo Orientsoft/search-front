@@ -100,22 +100,21 @@ Topo: {
 // 还需要完善
 Alert: {
     ts:发生时间
-    name:告警名字，
     description:告警描述，
     level:告警层级，
-    startts:起始时间，
-    endts:结束时间，
-    type: {simple,ml}                   // simple: 人工定义， ml:机器学习定义
-    value:                              // 发生值
+    startts:起始时间，
+    period:时间片长，
+    type: {simple,ml，...}              // simple: 人工定义， ml:机器学习定义
+    actualValue:                        // 实际值
     lowerBound:                         // 低线
     upperBound:                         // 高线
-    anomIndex:                          // 异常数据源
-    residual:
-    estimate:
-    gesdTestResult (true|false)
-    boundTestResult (true|false)
-    severity
-    alertExplain
+    anomIndex:                          // 异常指数
+    residual:                           // 残差
+    estimate:                           // 估算值
+    gesdTestResult (true|false)         // ml GESD测试结果
+    boundTestResult (true|false)        // ml 边界检测结果
+    simpleAlert (true|false)            // simple 规则触发结果
+    alertExplain                        // 告警释义
 }
 ```
 
