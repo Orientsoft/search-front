@@ -102,21 +102,17 @@ class Topology extends BaseComponent {
                             });
                             _node.connections = node.nodes.map(child => {
                                 return {
-                                    src: child.src,
-                                    target: child.target,
-                                    metrics: {
-                                        normal: 200
-                                    }
+                                    source: child.target,
+                                    target: child.src,
+                                    metrics: child.metrics || {}
                                 };
                             });
                         }
                         graph.nodes.push(_node);
                         graph.connections.push({
-                            src: node.src,
-                            target: node.target,
-                            metrics: {
-                                normal: 500
-                            }
+                            source: node.target,
+                            target: node.src,
+                            metrics: node.metrics || {}
                         });
                     }
                     return graph;
