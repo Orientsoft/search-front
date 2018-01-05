@@ -18,31 +18,33 @@ const { SubMenu } = Menu;
         // 获取所有指标
         this.elastic.getMetricDataSource().then(result => {
             this.appStore.config.metrics = this.getHits(result).map(data => JSON.parse(data._source.data));
-       });
-       // 获取所有数据源
-       this.elastic.getSingleDataSource().then(result => {
+        });
+        // 获取所有数据源
+        this.elastic.getSingleDataSource().then(result => {
             this.appStore.config.sources = this.getHits(result).reduce((sources, data) => {
                 sources[data._source.name] = JSON.parse(data._source.fields)
                 return sources;
             }, {});
-       });
+        });
     }
 
-    onMenuChanged({ item, key }){
-       const system = this.appStore.config.systems[key];
-       let metrics = [];
+    onMenuChanged({ item, key }) {
+        const system = this.appStore.config.systems[key];
+        let metrics = [];
 
-       this.appStore.selectedConfig.system = system;
-       for (let i = 0; i < system.metrics.length; i++) {
-           const _metrics = this.appStore.config.metrics.filter(metric => metric.name === system.metrics[i]);
+        if (system) {
+            this.appStore.selectedConfig.system = system;
+            for (let i = 0; i < system.metrics.length; i++) {
+                const _metrics = this.appStore.config.metrics.filter(metric => metric.name === system.metrics[i]);
 
-           if (_metrics.length) {
-               metrics = metrics.concat(_metrics);
-           }
-       }
-       this.appStore.selectedConfig.metrics = metrics;
-       this.appStore.selectedConfig.sources = system.sources.map(source => this.appStore.config.sources[source]);
-       console.log('selected config: ', mobx.toJS(this.appStore.selectedConfig));
+                if (_metrics.length) {
+                    metrics = metrics.concat(_metrics);
+                }
+            }
+            this.appStore.selectedConfig.metrics = metrics;
+            this.appStore.selectedConfig.sources = system.sources.map(source => this.appStore.config.sources[source]);
+            console.log('selected config: ', mobx.toJS(this.appStore.selectedConfig));
+        }
     }
 
     render() {
@@ -62,7 +64,7 @@ const { SubMenu } = Menu;
                                 return (<Menu.Item key={key}><Link to="/core">{system.name}</Link></Menu.Item>)
                             })}
                         </SubMenu>
-                       
+
                         {/* <Menu.Item key="singledataSearch"><Link to="/singledataSearch">单数据源查询</Link></Menu.Item> */}
                         <Menu.Item key="historySearch"><Link to="/historySearch">历史查询记录</Link></Menu.Item>
                         <Menu.Item key="2" className="searchManage">管理</Menu.Item>

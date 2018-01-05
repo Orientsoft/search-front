@@ -68,13 +68,11 @@ const FormItem = Form.Item;
 
     onTagetChanged(target) {
         this.postData.target = target;
-        console.log(target);
     }
 
-    onChildChange(childs) {
-        this.postData.nodes = childs.map(child => this.nodes[child]);
+    onChildChanged(childs) {
+        this.postData.nodes = childs.map(child => this.nodes[child].data);
         this.forceUpdate();
-        console.log(this.postData.nodes);
     }
 
     onDeleteNode(index) {
@@ -87,6 +85,7 @@ const FormItem = Form.Item;
                 key: this.nodes.length,
                 data: this.postData
             });
+            this.postData = {};
         }));
         this.props.setVisible(false);
     }
