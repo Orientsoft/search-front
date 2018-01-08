@@ -1,4 +1,4 @@
-import mobx, { observable } from 'mobx';
+import * as mobx from 'mobx';
 import merge from 'lodash/merge';
 
 /**
@@ -26,7 +26,7 @@ class Query {
      * @param {Object} [initialQuery] - 初始查询条件
      */
     constructor(initialQuery = {}) {
-        this.body = observable(initialQuery);
+        this.body = mobx.observable(initialQuery);
     }
 
     /**
