@@ -156,8 +156,8 @@ const FormItem = Form.Item;
         this.yaxis = '';
         this.xTitle = '';
         this.YTitle = '';
-
     }
+    
     onCancel() {
         this.props.setVisible(false);
     }
@@ -407,6 +407,8 @@ const FormItem = Form.Item;
             </div>
         );
     }
+
+
 }
 
 export default MetricContent;

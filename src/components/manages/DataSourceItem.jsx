@@ -44,6 +44,8 @@ const FormItem = Form.Item;
     componentWillMount() {
         this.elastic.getSingleDataSource().then(result => {
             this.dataSource = get(result, 'hits.hits', []).map(data => data._source);
+            this.appStore.config.sources = this.dataSource
+            
             for (var i = 0; i < this.dataSource.length; i++) {
                 let fields = JSON.parse(this.dataSource[i].fields)
                 let allkeys = []
@@ -53,7 +55,7 @@ const FormItem = Form.Item;
                 }
                 this.dataSource[i].keys = allkeys
             }
-            console.log('all', this.dataSource.slice())
+            
             this.enableEdit = Array(this.dataSource.length);
         });
         this.elastic.catIndices().then(action(indices => {
@@ -138,20 +140,36 @@ const FormItem = Form.Item;
     onEditKey(value) {
         this.getAllKeys(this.data.index)
         this.data.field = value;
-        //删除字段时对应的中文字段没有删除
-        for (var i = 0; i < value.length; i++) {           
-                i = value.length - 1
-                let obj = { field: value[i], label: '' }
-                this.data.fields.push(obj)
-        }
+
+        const oldFields = this.data.fields.slice();
+        this.data.fields.length = 0;
+        value.forEach((name) => {
+            let obj = oldFields.find(obj => obj.field === name);
+            if (!obj) {
+                obj = { field: name, label: '' };
+            }
+            this.data.fields.push(obj);
+        });
+        this.forceUpdate();
+
+        // const fields = [];
+        // //删除字段时对应的中文字段没有删除
+        // for (var i = 0; i < value.length; i++) {           
+        //         // i = value.length - 1
+        //         // let obj = { field: value[i], label: '' }
+        //         // this.data.fields.push(obj)
+        //     for (let j = this.data.fields.length - 1; j >= 0; j--) {
+        //         if (this.data.fields[j].field === value[i]) {
+        //             fields.push(cloneDeep(this.data.fields[j]));
+        //         }
+        //     }
+
+        // }
+        // this.forceUpdate()
     }
     onEditFieldName(e) {
         let value = e.target.value
         let field = e.target.dataset.field
-        // let obj = {
-        //     field: field,
-        //     label: value
-        // }
         for (let key in this.data.fields.slice()) {
             if (this.data.fields[key].field == field) {
                 this.data.fields[key].label = value
@@ -165,6 +183,9 @@ const FormItem = Form.Item;
         this.data.fields = JSON.stringify(fields)
         this.elastic.saveSingleDataSource(this.data.name, this.data);
         this.dataSource.push(this.data);
+        this.appStore.config.sources.slice().push(this.data);
+        console.log('save',this.appStore.config.sources)
+
         for (var i = 0; i < this.dataSource.length; i++) {
             let fields = JSON.parse(this.dataSource[i].fields)
             let keys = []
@@ -174,7 +195,6 @@ const FormItem = Form.Item;
             }
             this.dataSource[i].keys = keys
         }
-
 
         this.enableEdit.push(false);
         this.fields = []
@@ -188,7 +208,6 @@ const FormItem = Form.Item;
         this.ts = ''
         this.originname = ''
         this.props.setVisible(false)
-
     }
 
     onCancel() {
@@ -453,6 +472,7 @@ const FormItem = Form.Item;
 
     @action onDeleteSource(key) {
         const source = this.dataSource.splice(key, 1)[0];
+        this.appStore.config.sources.slice().splice(key, 1)[0];
         this.appStore.singleDatas = this.dataSource
         this.enableEdit[key] = false;
         this.elastic.deleteSingleDataSource(source.name);
