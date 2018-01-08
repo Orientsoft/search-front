@@ -135,10 +135,12 @@ const formItemLayout = {
         this.onSearch();
         
         runInAction(() => {
-            this.filterFields = flattenDeep(this.appStore.selectedConfig.sources).map((filter, key) => ({
-                key: key,
-                label: filter.label,
-                value: filter.field
+            this.filterFields = flattenDeep(this.appStore.selectedConfig.sources.map((filter) => {
+                return filter.fields.map((field, key) => ({
+                    key: key,
+                    label: field.label,
+                    value: field.field
+                }));
             }));
         });
     }

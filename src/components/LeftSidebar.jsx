@@ -22,9 +22,9 @@ const { SubMenu } = Menu;
         // 获取所有数据源
         this.elastic.getSingleDataSource().then(mobx.action(result => {
             this.appStore.config.sources = this.getHits(result).reduce((sources, data) => {
-                sources[data._source.name] = JSON.parse(data._source.fields)
-                return sources;
-            }, {});
+                data._source.fields = JSON.parse(data._source.fields);
+                return sources.concat(data._source);
+            }, []);
         }));
     }
 
@@ -42,7 +42,23 @@ const { SubMenu } = Menu;
                 }
             }
             this.appStore.selectedConfig.metrics = metrics;
-            this.appStore.selectedConfig.sources = system.sources.map(source => this.appStore.config.sources[source]);
+            this.appStore.selectedConfig.sources = system.sources.map(source => this.appStore.config.sources.find(s => s.name === source));
+            // 设置当前页面查询的索引
+            this.queryStore.index = system.sources.reduce((result, name) => {
+                const source = this.appStore.config.sources.find(source => source.name === name);
+                
+                if (source) {
+                    result.push(source.index);
+                }
+                return result;
+            }, []).concat(metrics.reduce((result, metric) => {
+                const source = this.appStore.config.sources.find(source => source.name === metric.source);
+                
+                if (source) {
+                    result.push(source.index);
+                }
+                return result;
+            }, []));
             console.log('selectedConfig: ', mobx.toJS(this.appStore.selectedConfig));
         }
     }

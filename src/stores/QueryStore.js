@@ -13,7 +13,7 @@ export class QueryStore {
     constructor() {
         extendObservable(this, {
             // 当前激活索引
-            index: ['mobile-weblogic-jvm-*'],
+            index: [],
             size: 101,
             // 过滤字段
             filterFields: [{
