@@ -3,7 +3,8 @@ import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
 import { Row, Col, Select, Input, Button, Modal, Form } from 'antd';
 import get from 'lodash/get';
-import values from 'lodash/values'
+import cloneDeep from 'lodash/cloneDeep';
+import values from 'lodash/values';
 import BaseComponent from '../BaseComponent';
 
 const Option = Select.Option;
@@ -40,7 +41,7 @@ const FormItem = Form.Item;
         this.elastic.getMetricDataSource().then(result => {
             let data = get(result, 'hits.hits', []).map(data => data._source);
             this.appStore.config.metrics = data;
-            console.log(' this.appStore.config.metrics ', this.appStore.config.metrics )
+            
             for (let key in data) {
                 this.dataSource[key] = JSON.parse(data[key].data);
                 this.dataSource[key]['fieldShow'] = [];
@@ -57,6 +58,7 @@ const FormItem = Form.Item;
                 }
                 this.dataSource[key].fieldShow = allshow;
             }
+            console.log(' this.datasource ',this.dataSource)
         })
         this.elastic.getSingleDataSource().then(result => {
             this.setState({
@@ -82,7 +84,7 @@ const FormItem = Form.Item;
         this.data.source = this.source.name
         let keys = get(this.source, 'fields', [])
         this.fields = JSON.parse(keys)
-        console.log('source',this.data.source)
+        console.log('source', this.source)
     }
 
     onNameChange(e) {
@@ -99,7 +101,7 @@ const FormItem = Form.Item;
     onTypeChange(e) {
         this.data.chart.type = e;
         this.chartType = e;
-        console.log('type',this.data.chart.type)
+        console.log('type', this.data.chart.type)
     }
     onTitleChange(e) {
         this.data.chart.title = e;
@@ -114,19 +116,18 @@ const FormItem = Form.Item;
     onTitleYChange(e) {
         this.data.chart.y.label = e;
         this.YTitle = e;
-        console.log('ylabel',  this.data.chart.y.label)
+        console.log('ylabel', this.data.chart.y.label)
     }
     onTitleXChange(e) {
         this.data.chart.x.label = e.target.value;
         this.data.chart.x.field = e.target.dataset.xaxis;
         this.xTitle = e.target.value;
-        console.log('xlabel',   this.data.chart.x.label,this.data.chart.x.field)
+        console.log('xlabel', this.data.chart.x.label, this.data.chart.x.field)
     }
-
     onSave(e) {
         var xfields = values(this.xfields);
         this.data.fields = xfields
-        
+
         this.elastic.saveMetricDataSource(this.data.name, {
             data: JSON.stringify(this.data)
         });
@@ -157,29 +158,125 @@ const FormItem = Form.Item;
         this.xTitle = '';
         this.YTitle = '';
     }
-    
     onCancel() {
         this.props.setVisible(false);
+        this.data = { name: '', source: '', fields: [], chart: { title: '', type: '', x: { field: '', label: '' }, y: { field: '', label: '' } } }
+        this.fields = [];
+        this.originName = '';
+        this.originSource = '';
+        this.chartType = '';
+        this.chartTitle = '';
+        this.yaxis = '';
+        this.xTitle = '';
+        this.YTitle = '';
     }
+
+    //修改
+    onSourceEdit(key) {
+        this.fields = [];
+
+        this.source = this.state.sources[key];
+        this.data.source = this.source.name;
+        //数据源改变，y轴改变
+        this.data.chart.y.field = '';
+        this.data.chart.y.label = '';
+        //数据源改变，字段改变
+        let keys = get(this.source, 'fields', []);
+        this.fields = JSON.parse(keys);
+        let fields = []
+        for (let i = 0; i < this.fields.length; i++) {
+            var obj = { field: this.fields[i].field, value: '' }
+            fields.push(obj)
+        }
+        this.data.fields = fields
+    }
+
+    onfieldNameEdit(e) {
+        var field = e.target.dataset.field;
+        var value = e.target.value;
+        for (let key in this.data.fields.slice()) {
+            if (this.data.fields[key].field == field) {
+                this.data.fields[key].value = value
+            }
+        }
+        console.log('allfields', this.data.fields.slice())
+
+        //var obj = { field: field, value: value }
+        // this.data.fields.push(obj)
+        //this.xfields[field] = obj;
+    }
+    onTypeEdit(e) {
+        this.data.chart.type = e;
+    }
+    onTitleEdit(e) {
+        this.data.chart.title = e;
+    }
+    onYaxisEdit(e) {
+        this.data.chart.y.field = e;
+        console.log('y', this.data.chart.y.field)
+    }
+    onTitleYEdit(e) {
+        this.data.chart.y.label = e;
+
+        console.log('ylabel', this.data.chart.y.label)
+    }
+    onTitleXEdit(e) {
+        this.data.chart.x.label = e.target.value;
+        this.data.chart.x.field = e.target.dataset.xaxis;
+
+        console.log('xlabel', this.data.chart.x.label, this.data.chart.x.field)
+    }
+
     onSaveChange() {
+        let fields = [];
+        for (let key in this.data.fields.slice()) {
+            if (this.data.fields[key].value != '') {
+                fields.push(this.data.fields[key])
+            }
+        }
+        this.data.fields = fields;
         console.log('savechange',this.data)
+        this.elastic.updateMetricDataSource(this.data.name, {
+            data: JSON.stringify(this.data)
+        });
+        //展示的字段
+        for (let i = 0; i < this.dataSource.length; i++) {
+            if (this.dataSource[i].name == this.data.name) {
+                this.dataSource[i] = this.data
+                let fields = this.dataSource[i].fields
+                var allshow = []
+                for (let key in fields.slice()) {
+                    let field = fields[key].field
+                    let value = fields[key].value
+                    let show = field + ' = ' + value
+                    allshow.push(show)
+                }
+                this.dataSource[i].fieldShow = allshow
+            }
+        }
+        this.setState({
+            visibleEdit: false
+        })
     }
     onCancelChange() {
         this.setState({
             visibleEdit: false
         })
-        this.data = { name: '', source: '', fields: [], chart: { title: '', type: '', x: { field: '', label: '' }, y: { field: '', label: '' } } }        
+        this.data = { name: '', source: '', fields: [], chart: { title: '', type: '', x: { field: '', label: '' }, y: { field: '', label: '' } } }
     }
 
-    @action onEditSource(key,name) {
+    @action onEditSource(key, name) {
         this.setState({
             visibleEdit: true
         })
+
+        //this.source = this.state.sources[key];
         this.name = name
         for (var i = 0; i < this.dataSource.length; i++) {
             if (name == this.dataSource[i].name) {
                 this.data = this.dataSource[i]
-                console.log('this.data',this.data)
+                this.source = this.state.sources[key]
+                console.log('this.data', this.data, this.source)
             }
         }
     }
@@ -269,10 +366,10 @@ const FormItem = Form.Item;
         let antdFormEdit = <Form horizonal='true'>
             <h4>指标选项</h4>
             <FormItem {...formItemLayout} label='指标名:'>
-                <Input value={this.data.name} disabled/>
+                <Input value={this.data.name} disabled />
             </FormItem>
             <FormItem {...formItemLayout} label='数据源:'>
-                <Select value={this.data.source} style={{ width: '100%' }} onChange={(value) => this.onSourceChanged(value)}>
+                <Select value={this.data.source} style={{ width: '100%' }} onChange={(value) => this.onSourceEdit(value)}>
                     {this.state.sources && this.state.sources.map((source, key) => <Option key={key} value={key}>{source.name}</Option>)}
                 </Select>
             </FormItem>
@@ -285,20 +382,20 @@ const FormItem = Form.Item;
                     </Col>
                     <Col span="11">
                         <FormItem {...formItemLayoutSelect} label='值:' >
-                            <Input data-field={item.field} onChange={(e) => this.onfieldNameChange(e)} value={item.value}/>
+                            <Input data-field={item.field} onChange={(e) => this.onfieldNameEdit(e)} value={item.value} />
                         </FormItem>
                     </Col>
                 </Row>
             ))}
             <h4>图表选项</h4>
             <FormItem {...formItemLayout} label='类型:'>
-                <Select value={this.data.chart.type} style={{ width: '100%' }} onChange={(value) => this.onTypeChange(value)}>
+                <Select value={this.data.chart.type} style={{ width: '100%' }} onChange={(value) => this.onTypeEdit(value)}>
                     <Option value="bar" key="bar">bar</Option>
                     <Option value="line" key="line">line</Option>
                 </Select>
             </FormItem>
             <FormItem {...formItemLayout} label='标题:'>
-                <Input value={this.data.chart.title} onChange={(e) => this.onTitleChange(e.target.value)} />
+                <Input value={this.data.chart.title} onChange={(e) => this.onTitleEdit(e.target.value)} />
             </FormItem>
             <Row >
                 <Col span="11" offset="2" >
@@ -373,7 +470,7 @@ const FormItem = Form.Item;
                                 <Select
                                     mode="tags"
                                     placeholder="Please select"
-                                    value={item.fieldShow}
+                                    value={item.fieldShow ? item.fieldShow.slice() : []}
                                     style={{ width: '100%' }}
                                     disabled
                                 >

@@ -172,6 +172,17 @@ export default {
             id: Buffer.from(name).toString('base64')
         }).catch(throwQueryError('deleteMetricDataSource()'));
     },
+    // 修改指标
+    updateMetricDataSource: (name, data) => {
+        return client.update({
+            index: 'query',
+            type: 'metric',
+            id: Buffer.from(name).toString('base64'),
+            body: {
+                doc: data
+            }
+        }).catch(throwQueryError('updateMetricDataSource()'));
+    },
 
 
     // 修改单数据源
@@ -196,17 +207,7 @@ export default {
             }
         }).catch(throwQueryError('updateMultipleDataSource()'));
     },
-    // 修改指标
-    updateMetricDataSource: (name, data) => {
-        return client.update({
-            index: 'query',
-            type: 'metric',
-            id: Buffer.from(name).toString('base64'),
-            body: {
-                doc: data
-            }
-        }).catch(throwQueryError('updateMetricDataSource()'));
-    },
+
     // 获取拓扑配置
     getNodes: (name) => {
         let query = {
