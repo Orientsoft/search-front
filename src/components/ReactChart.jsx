@@ -3,7 +3,6 @@ import BaseComponent from './BaseComponent';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import * as moment from 'moment';
-// import Item from '_antd@3.0.3@antd/lib/list/Item';
 
 // 数据结构
 // const data = [
@@ -15,8 +14,7 @@ import * as moment from 'moment';
 
 const chartConfig = [
     { name: '手机', fileds: {}, type: 'line', title: '中间件', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
-    { name: '手机', fileds: {}, type: 'histogram', title: 'tploader', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
-    { name: '手机', fileds: {}, type: 'line', title: 'DB', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
+    { name: '手机', fileds: {}, type: 'histogram', title: 'tploader', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' }
 ]
 @observer class ReactChart extends BaseComponent {
     constructor(props, context) {
@@ -30,6 +28,22 @@ const chartConfig = [
         this.darkenColor = this.darkenColor.bind(this);
     }
 
+    // @computed get data() {
+    //     // const aggs = this.getBuckets(this.queryStore.filterFields[0].field);
+    //     var data = [];
+    //     data = this.queryStore.filterFields.map((filterField) => {
+    //         return this.getBuckets(filterField.field).map(agg => this.getBuckets('@timestamp', {
+    //             aggregations: agg
+    //         })).reduce((result, buckets) => result.concat(buckets.map(bucket => [
+    //             new Date(bucket.key),
+    //             bucket.doc_count
+    //         ])), []);
+    //     })
+
+    //     return data;
+
+    // }
+
     @computed get data() {
         const aggs = this.getBuckets(this.queryStore.filterFields[0].field);
 
@@ -40,12 +54,29 @@ const chartConfig = [
             bucket.doc_count
         ])), []);
     }
+    // @computed get data() {
+
+    //     return this.queryStore.filterFields.map((filterField) => {
+    //         return this.getBuckets(filterField.field).map(agg => this.getBuckets('@timestamp', {
+    //             aggregations: agg
+    //         })).reduce((result, buckets) => result.concat(buckets.map(bucket => [
+    //             new Date(bucket.key),
+    //             bucket.doc_count
+    //         ])), []);
+    //     })
+    // }
+
 
     render() {
-
-        console.log('data=' + this.data);
         return (
             <div className="clearfix">
+                {
+                    // this.state.chartConfig.length > 0 && this.data[0].length > 0 && this.state.chartConfig.map((item, key) => (
+                    //     <div key={key} className="chart">
+                    //         <div key={key} ref={el => this.initChart(el, key, this.data[key], item)}></div>
+                    //     </div>
+                    // ))
+                }
                 {
                     this.state.chartConfig.length > 0 && this.data.length > 0 && this.state.chartConfig.map((item, key) => (
                         <div key={key} className="chart">
@@ -53,16 +84,11 @@ const chartConfig = [
                         </div>
                     ))
                 }
-                {/* {this.state.data.length > 0 && this.state.data.map((item, key) => (
-                    <div key={key} className="chart">
-                        <div key={key} ref={el => this.initChart(el, key, item.data, item.title)} ></div>
-                    </div>
-                ))} */}
             </div>
         );
     }
     componentDidUpdate() {
-        if ( this.charts.length > 0 && this.charts.length == this.state.chartConfig.length ){
+        if (this.charts.length > 0 && this.charts.length == this.state.chartConfig.length) {
             var sync = Dygraph.synchronize(this.charts);
         }
     }
@@ -78,6 +104,7 @@ const chartConfig = [
                     height: 200,
                     colors: ['#CC3333'],
                     fillGraph: true,
+                    legend: 'follow',
                     // xRangePad: 50,
                     highlightCircleSize: 6,
                     axisLineWidth: 1,
@@ -105,6 +132,7 @@ const chartConfig = [
                     axisLineWidth: 1,
                     ylabel: chartConfig.Ytitle,
                     xlabel: chartConfig.Xtitle,
+                    legend: 'follow',
                     // drawAxesAtZero: true, 
                     // includeZero: true, 
                     // strokeWidth: 2,

@@ -1,6 +1,7 @@
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import Vizceral from '../libs/Vizceral';
+import Breadcrumb from './queries/Breadcrumb';
 import BaseComponent from './BaseComponent';
 
 const rootNode = {
@@ -13,8 +14,18 @@ const rootNode = {
 class Topology extends BaseComponent {
     constructor(props) {
         super(props);
+        this.loadingVizceral = true;
         this.state = {
-            currentView: undefined,
+            breadcrumb: [{
+                name: '系统',
+                props: {
+                    to: '#',
+                    onClick: () => this.setState({
+                        currentView: []
+                    })
+                }
+            }],
+            currentView: [],
             redirectedFrom: undefined,
             selectedChart: undefined,
             displayOptions: {
@@ -81,6 +92,29 @@ class Topology extends BaseComponent {
         this.setState({ highlightedObject: highlightedObject, objectToHighlight: highlightedObject ? highlightedObject.getName() : undefined, searchTerm: '', matches: { total: -1, visible: -1 }, redirectedFrom: undefined });
     }
 
+    viewChanged(view) {
+        const breadcrumb = [this.state.breadcrumb[0]];
+
+        for (let i = 0; i < view.view.length; i++) {
+            breadcrumb.push({
+                name: view.view[i],
+                props: {
+                    to: '#',
+                    onClick: () => this.setState({
+                        currentView: view.view.slice(0, i + 1)
+                    })
+                }
+            });
+        }
+        if (!this.loadingVizceral) {
+            this.setState({
+                breadcrumb,
+                currentView: view.view
+            });
+        }
+        this.loadingVizceral = false;
+    }
+
     componentWillMount() {
         this.elastic.getNodes().then(result => {
             const nodes = this.getHits(result).map(data => data._source);
@@ -122,24 +156,41 @@ class Topology extends BaseComponent {
     }
 
     render() {
+        const {
+            breadcrumb,
+            trafficData,
+            currentView,
+            displayOptions,
+            filters,
+            objectToHighlight,
+            searchTerm,
+            modes,
+            definitions,
+            styles
+        } = this.state;
+
         return (
-            <Vizceral
-                traffic={this.state.trafficData}
-                view={this.state.currentView}
-                showLabels={this.state.displayOptions.showLabels}
-                filters={this.state.filters}
-                viewChanged={this.viewChanged}
-                viewUpdated={this.viewUpdated}
-                objectHighlighted={this.objectHighlighted}
-                nodeContextSizeChanged={this.nodeContextSizeChanged}
-                objectToHighlight={this.state.objectToHighlight}
-                matchesFound={this.matchesFound}
-                match={this.state.searchTerm}
-                modes={this.state.modes}
-                definitions={this.state.definitions}
-                styles={this.state.styles}
-                allowDraggingOfNodes={this.state.displayOptions.allowDraggingOfNodes} 
-            />
+            <div className="workspace">
+                <Breadcrumb items={breadcrumb} />
+                <div style={{height: '100vh'}}>
+                    <Vizceral
+                        traffic={trafficData}
+                        view={currentView}
+                        showLabels={displayOptions.showLabels}
+                        filters={filters}
+                        viewChanged={(view) => this.viewChanged(view)}
+                        viewUpdated={this.viewUpdated}
+                        objectHighlighted={this.objectHighlighted}
+                        nodeContextSizeChanged={this.nodeContextSizeChanged}
+                        objectToHighlight={objectToHighlight}
+                        matchesFound={this.matchesFound}
+                        match={searchTerm}
+                        modes={modes}
+                        definitions={definitions}
+                        styles={styles}
+                        allowDraggingOfNodes={displayOptions.allowDraggingOfNodes} />
+                </div>
+            </div>
         );
     }
 }

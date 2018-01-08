@@ -230,5 +230,22 @@ export default {
             id: Buffer.from(name).toString('base64'),
             body: data
         }).catch(throwQueryError('saveNode()'));
+    },
+    updateNode: (name, data) => {
+        return client.update({
+            index: 'query',
+            type: 'nodes',
+            id: Buffer.from(name).toString('base64'),
+            body: {
+                doc: data
+            }
+        }).catch(throwQueryError('updateNode()'));
+    },
+    deleteNode: (name) => {
+        return client.delete({
+            index: 'query',
+            type: 'nodes',
+            id: Buffer.from(name).toString('base64')
+        }).catch(throwQueryError('deleteNode()'));
     }
 };

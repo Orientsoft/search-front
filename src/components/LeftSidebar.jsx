@@ -1,5 +1,5 @@
 import React from 'react';
-import mobx, { observable, computed, action } from 'mobx';
+import * as mobx from 'mobx';
 import { observer } from 'mobx-react';
 import get from 'lodash/get';
 import { Link } from 'react-router-dom'
@@ -12,20 +12,20 @@ const { SubMenu } = Menu;
 @observer class LeftSidebar extends BaseComponent {
     componentWillMount() {
         // 获取所有系统
-        this.elastic.getMultipleDataSource().then(action(result => {
+        this.elastic.getMultipleDataSource().then(mobx.action(result => {
             this.appStore.config.systems = this.getHits(result).map(data => JSON.parse(data._source.data));
         }));
         // 获取所有指标
-        this.elastic.getMetricDataSource().then(result => {
+        this.elastic.getMetricDataSource().then(mobx.action(result => {
             this.appStore.config.metrics = this.getHits(result).map(data => JSON.parse(data._source.data));
-        });
+        }));
         // 获取所有数据源
-        this.elastic.getSingleDataSource().then(result => {
+        this.elastic.getSingleDataSource().then(mobx.action(result => {
             this.appStore.config.sources = this.getHits(result).reduce((sources, data) => {
                 sources[data._source.name] = JSON.parse(data._source.fields)
                 return sources;
             }, {});
-        });
+        }));
     }
 
     onMenuChanged({ item, key }) {
@@ -43,7 +43,7 @@ const { SubMenu } = Menu;
             }
             this.appStore.selectedConfig.metrics = metrics;
             this.appStore.selectedConfig.sources = system.sources.map(source => this.appStore.config.sources[source]);
-            console.log('selected config: ', mobx.toJS(this.appStore.selectedConfig));
+            console.log('selectedConfig: ', mobx.toJS(this.appStore.selectedConfig));
         }
     }
 

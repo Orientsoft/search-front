@@ -1,7 +1,8 @@
 import React from 'react';
 import { Row, Col, Form, Checkbox, Button, Select, DatePicker } from 'antd';
-import mobx, { action } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
+import flattenDeep from 'lodash/flattenDeep';
 import * as moment from 'moment';
 import BaseComponent from '../BaseComponent';
 
@@ -23,6 +24,8 @@ const formItemLayout = {
     timeSize = 'minute';
     // 时间格式，'x'表示Unix毫秒时间戳
     timeFormat = 'x';
+    // 过滤字段
+    @observable.ref filterFields = []
 
     /**
      * 限制时间选择范围
@@ -102,10 +105,9 @@ const formItemLayout = {
     }
 
     onSearch(value) {
-        
         const requestBody = this.requestBody.highlight(['message.msg.ThreadActiveCount']);
         requestBody.add(this.queryStore.buildSearch());
-        this.elastic.search(requestBody.toJSON());
+        return this.elastic.search(requestBody.toJSON());
     }
 
     @action.bound onDateTimeChange(date, type) {
@@ -127,6 +129,18 @@ const formItemLayout = {
             }
             this.queryStore.endMoment = date;
         }
+    }
+
+    componentWillMount() {
+        this.onSearch();
+        
+        runInAction(() => {
+            this.filterFields = flattenDeep(this.appStore.selectedConfig.sources).map((filter, key) => ({
+                key: key,
+                label: filter.label,
+                value: filter.field
+            }));
+        });
     }
 
     render() {
@@ -161,12 +175,7 @@ const formItemLayout = {
                             format="YYYY-MM-DD HH:mm:ss" />
                     </FormItem>
                     <FormItem {...formItemLayout} label="过滤字段">
-                        <CheckboxGroup options={[
-                            { label: '交易码', value: 'TransCode' },
-                            { label: '耗时', value: 'UseTime' },
-                            { label: '交易内容', value: 'TranName' },
-                            { label: '非成功交易', value: 'TranCode' }
-                        ]} Change={value => this.onFieldChange(value)} />
+                        <CheckboxGroup options={this.filterFields} Change={value => this.onFieldChange(value)} />
                     </FormItem>
                     <FormItem {...formItemLayout} label="条件筛选">
                         <Col span={20}>
