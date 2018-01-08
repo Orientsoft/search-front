@@ -76,7 +76,14 @@ const FormItem = Form.Item;
     }
 
     onDeleteNode(index) {
-        console.log('delete node: ', index);
+        const node = this.nodes[index];
+        this.elastic.deleteNode(node.data.src).then(() => {
+            // 调整索引
+            for (let i = index + 1; i < this.nodes.length; i++) {
+                --this.nodes[i].key;
+            }
+            this.nodes.splice(index, 1);
+        });
     }
 
     onSave() {

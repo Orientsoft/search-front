@@ -229,5 +229,12 @@ export default {
             id: Buffer.from(name).toString('base64'),
             body: data
         }).catch(throwQueryError('saveNode()'));
+    },
+    deleteNode: (name) => {
+        return client.delete({
+            index: 'query',
+            type: 'nodes',
+            id: Buffer.from(name).toString('base64')
+        }).catch(throwQueryError('deleteNode()'));
     }
 };
