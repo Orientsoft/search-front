@@ -1,4 +1,4 @@
-import mobx, { observable } from 'mobx';
+import * as mobx from 'mobx';
 import merge from 'lodash/merge';
 
 /**
@@ -28,7 +28,7 @@ class Aggregation {
      */
     constructor(name, initialAgg = {}) {
         this.name = name;
-        this.body = observable(initialAgg);
+        this.body = mobx.observable(initialAgg);
     }
 
     /**

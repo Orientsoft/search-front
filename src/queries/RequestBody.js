@@ -1,4 +1,4 @@
-import mobx, { observable } from 'mobx';
+import * as mobx from 'mobx';
 import queryStore from '../stores/QueryStore';
 import Query from './core/Query';
 import Aggregation from './core/Aggregation';
@@ -12,11 +12,11 @@ import isPlainObject from 'lodash/isPlainObject';
  */
 class RequestBody {
     // 保存通过方法调用(例如：add())添加的查询对象，可以是任何值
-    @observable queries = [];
+    @mobx.observable queries = [];
     
     constructor(initialBody) {
         // 保存只通过方法调用修改而不添加的查询对象，例如index、type、from等等
-        this.body = observable(isPlainObject(initialBody) ? initialBody : {
+        this.body = mobx.observable(isPlainObject(initialBody) ? initialBody : {
             index: queryStore.index.toString(),
             body: {}
         });
@@ -34,7 +34,7 @@ class RequestBody {
             this.body.body[key].set(value);
         } else {
             // 原始值的改动并不会直接被mobx追踪到，此处需要利用observable.box()方法进行装箱
-            this.body.body[key] = observable.box(value);
+            this.body.body[key] = mobx.observable.box(value);
         }
         // 返回自身，以便可以进行链式调用
         return this;
