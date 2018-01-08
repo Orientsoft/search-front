@@ -17,7 +17,7 @@ export class AppStore {
             singleDataType: '',
             singleDatas: [],
             config: {
-                sources: {},
+                sources: [],
                 // 所有指标
                 metrics: [],
                 // 所有系统

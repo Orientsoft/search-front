@@ -39,21 +39,23 @@ const FormItem = Form.Item;
     componentWillMount() {
         this.elastic.getMetricDataSource().then(result => {
             let data = get(result, 'hits.hits', []).map(data => data._source);
+            this.appStore.config.metrics = data;
+            console.log(' this.appStore.config.metrics ', this.appStore.config.metrics )
             for (let key in data) {
-                this.dataSource[key] = JSON.parse(data[key].data)
-                this.dataSource[key]['fieldShow'] = []
+                this.dataSource[key] = JSON.parse(data[key].data);
+                this.dataSource[key]['fieldShow'] = [];
             }
             //设置字段显示数据为 a=b, 通过为datasource添加fieldShow字段
             for (let key in this.dataSource.slice()) {
-                let fields = this.dataSource[key].fields
-                var allshow = []
+                let fields = this.dataSource[key].fields;
+                var allshow = [];
                 for (let j in fields.slice()) {
-                    let field = fields[j].field
-                    let value = fields[j].value
-                    let show = field + ' = ' + value
-                    allshow.push(show)
+                    let field = fields[j].field;
+                    let value = fields[j].value;
+                    let show = field + ' = ' + value;
+                    allshow.push(show);
                 }
-                this.dataSource[key].fieldShow = allshow
+                this.dataSource[key].fieldShow = allshow;
             }
         })
         this.elastic.getSingleDataSource().then(result => {
@@ -95,7 +97,6 @@ const FormItem = Form.Item;
         this.xfields[field] = obj;
     }
     onTypeChange(e) {
-         
         this.data.chart.type = e;
         this.chartType = e;
         console.log('type',this.data.chart.type)
@@ -130,6 +131,7 @@ const FormItem = Form.Item;
             data: JSON.stringify(this.data)
         });
         this.dataSource.push(this.data)
+        this.appStore.config.metrics.push(this.data)
 
         //设置显示的字段        
         let length = this.dataSource.length - 1
@@ -154,8 +156,8 @@ const FormItem = Form.Item;
         this.yaxis = '';
         this.xTitle = '';
         this.YTitle = '';
-
     }
+    
     onCancel() {
         this.props.setVisible(false);
     }
@@ -184,6 +186,7 @@ const FormItem = Form.Item;
 
     @action onDeleteSource(key, name) {
         const source = this.dataSource.splice(key, 1)[0];
+        this.appStore.config.metrics.splice(key, 1)[0];
         // this.enableEdit[key] = false;
         this.elastic.deleteMetricDataSource(name);
     }
@@ -404,6 +407,8 @@ const FormItem = Form.Item;
             </div>
         );
     }
+
+
 }
 
 export default MetricContent;
