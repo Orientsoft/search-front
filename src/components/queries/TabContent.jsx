@@ -53,36 +53,24 @@ const cols = [
 			}
 		});
 	}
-
 	@computed get columns() {
 		var column = cols.map((col, key) => {
-			if (key == 0 || key == 1) {
+			if (key < 3) {
 				return {
-					title: col['label'],
-					dataIndex: col['field'],
-					key: col['field'],
-					width: 150,
-					fixed: 'left',
-					render: (text) => <p className="wordBreak" dangerouslySetInnerHTML={{ __html: text }} />
+					title: col.label,
+					width: 200, 
+					key: col.label, 
+					fixed: 'left', 
+					render: (text, record) => <p className="wordBreak">{record[col.field]}</p>
 				}
-			} else if (key == 2) {
+			}else {
 				return {
-					title: col['label'],
-					dataIndex: col['field'],
-					key: col['field'],
-					width: 150,
-					fixed: 'left',
-					render: (text) => <p className="wordBreak" dangerouslySetInnerHTML={{ __html: text }} />
+					title: col.label, 
+					width: 150, 
+					key: col.label, 
+					render: (text, record) => <p className="ellipsis">{record[col.field]}</p>
 				}
-			}
-			else if (key >= 3) {
-				return {
-					title: col['label'],
-					dataIndex: col['field'],
-					key: col['filed'],
-					// width: 250,
-					render: (text) => <p className="ellipsis" dangerouslySetInnerHTML={{ __html: text }} />
-				}
+
 			}
 		})
 		column.push({
@@ -143,9 +131,6 @@ const cols = [
 	}
 
 	render() {
-
-		console.log('tableData');
-		console.log(this.tableData);
 		return (
 			<div className="tabContent">
 				<Card>
