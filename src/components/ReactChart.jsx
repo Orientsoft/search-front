@@ -68,8 +68,6 @@ const chartConfig = [
 
 
     render() {
-
-        console.log('data=' + this.data.length);
         return (
             <div className="clearfix">
                 {
