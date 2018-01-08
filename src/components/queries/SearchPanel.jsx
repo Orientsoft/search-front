@@ -129,6 +129,10 @@ const formItemLayout = {
         }
     }
 
+    componentWillMount() {
+        this.onSearch();
+    }
+
     render() {
         return (
             <div>
