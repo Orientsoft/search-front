@@ -114,8 +114,13 @@ const FormItem = Form.Item;
         });
 
         for (var i = 0; i < this.dataSources.length; i++) {
-            if (name == this.dataSources[i].name) {
+            if (this.data2.name == this.dataSources[i].name) {
                 this.dataSources[i] = this.data2
+            }
+        }
+        for (var i = 0; i < this.appStore.config.systems.length; i++) {
+            if (this.data2.name == this.appStore.config.systems[i].name) {
+                this.appStore.config.systems[i] = this.data2
             }
         }
         this.enableEdit[key] = false;
