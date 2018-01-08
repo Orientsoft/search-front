@@ -40,10 +40,12 @@ const FormItem = Form.Item;
     componentWillMount() {
         this.elastic.getMetricDataSource().then(result => {
             let data = get(result, 'hits.hits', []).map(data => data._source);
-            this.appStore.config.metrics = data;
-            
+            //this.appStore.config.metrics = data;
+          
+
             for (let key in data) {
                 this.dataSource[key] = JSON.parse(data[key].data);
+                this.appStore.config.metrics[key] = JSON.parse(data[key].data);
                 this.dataSource[key]['fieldShow'] = [];
             }
             //设置字段显示数据为 a=b, 通过为datasource添加fieldShow字段
@@ -58,7 +60,7 @@ const FormItem = Form.Item;
                 }
                 this.dataSource[key].fieldShow = allshow;
             }
-            console.log(' this.datasource ',this.dataSource)
+            console.log(' this.datasource ', this.dataSource)
         })
         this.elastic.getSingleDataSource().then(result => {
             this.setState({
@@ -199,11 +201,6 @@ const FormItem = Form.Item;
                 this.data.fields[key].value = value
             }
         }
-        console.log('allfields', this.data.fields.slice())
-
-        //var obj = { field: field, value: value }
-        // this.data.fields.push(obj)
-        //this.xfields[field] = obj;
     }
     onTypeEdit(e) {
         this.data.chart.type = e;
@@ -213,18 +210,13 @@ const FormItem = Form.Item;
     }
     onYaxisEdit(e) {
         this.data.chart.y.field = e;
-        console.log('y', this.data.chart.y.field)
     }
     onTitleYEdit(e) {
         this.data.chart.y.label = e;
-
-        console.log('ylabel', this.data.chart.y.label)
     }
     onTitleXEdit(e) {
         this.data.chart.x.label = e.target.value;
         this.data.chart.x.field = e.target.dataset.xaxis;
-
-        console.log('xlabel', this.data.chart.x.label, this.data.chart.x.field)
     }
 
     onSaveChange() {
@@ -235,7 +227,13 @@ const FormItem = Form.Item;
             }
         }
         this.data.fields = fields;
-        console.log('savechange',this.data)
+        //更新 appstore
+        for (let i = 0; i < this.appStore.config.metrics.length; i++) {
+            if (this.appStore.config.metrics[i].name == this.data.name) {
+                this.appStore.config.metrics[i] = this.data
+            }
+        }
+
         this.elastic.updateMetricDataSource(this.data.name, {
             data: JSON.stringify(this.data)
         });
@@ -254,15 +252,16 @@ const FormItem = Form.Item;
                 this.dataSource[i].fieldShow = allshow
             }
         }
+       
         this.setState({
             visibleEdit: false
-        })
+        });
     }
     onCancelChange() {
         this.setState({
             visibleEdit: false
-        })
-        this.data = { name: '', source: '', fields: [], chart: { title: '', type: '', x: { field: '', label: '' }, y: { field: '', label: '' } } }
+        });
+        this.data = { name: '', source: '', fields: [], chart: { title: '', type: '', x: { field: '', label: '' }, y: { field: '', label: '' } } };
     }
 
     @action onEditSource(key, name) {
