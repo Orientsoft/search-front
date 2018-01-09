@@ -56,7 +56,7 @@ const TabPane = Tabs.TabPane;
 
     @computed get fields() {
         var selectedFields = flattenDeep(this.appStore.selectedConfig.sources.map((filter) => {
-            if (filter.fields.map){
+            if (filter.fields.map) {
                 return filter.fields.map((field, key) => ({
                     key: key,
                     label: field.label,
@@ -68,7 +68,7 @@ const TabPane = Tabs.TabPane;
         var result = [
             { 'field': '@timestamp', 'label': '时间' },
             { 'field': 'index', 'label': '数据源' }
-        ]
+        ];
         selectedFields.map((item) => result.push(item))
         return result
     }
@@ -113,19 +113,19 @@ const TabPane = Tabs.TabPane;
             this.state.result = this.getHits();
         };
         return this.state.result.map((hit, key) => {
-            
             if (this.fields.length > 2) {
                 var fields = this.fields.map((col, key) => {
                     var field = col.field
                     var source = hit._source
-                    if (field == 'index') {
+
+                    if (field === 'index') {
                         return {
                             [field]: hit._index
                         }
                     }
-                        return {
-                            [field]: get(source, field)
-                        }
+                    return {
+                        [field]: get(source, field)
+                    }
                 })
 
                 fields.push({
@@ -137,7 +137,6 @@ const TabPane = Tabs.TabPane;
                 return tableDataObj
             }
             return []
-
         });
     }
 
