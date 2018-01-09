@@ -56,13 +56,11 @@ const TabPane = Tabs.TabPane;
 
     @computed get fields() {
         var selectedFields = flattenDeep(this.appStore.selectedConfig.sources.map((filter) => {
-            if (filter.fields.map) {
-                return filter.fields.map((field, key) => ({
-                    key: key,
-                    label: field.label,
-                    field: field.field
-                }));
-            }
+            return filter.fields.slice().map((field, key) => ({
+                key: key,
+                label: field.label,
+                field: field.field
+            }));
         }));
 
         var result = [

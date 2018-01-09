@@ -136,7 +136,7 @@ const formItemLayout = {
         
         runInAction(() => {
             this.filterFields = flattenDeep(this.appStore.selectedConfig.sources.map((filter) => {
-                return filter.fields.map((field, key) => ({
+                return filter.fields.slice().map((field, key) => ({
                     key: key,
                     label: field.label,
                     value: field.field
