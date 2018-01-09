@@ -190,7 +190,6 @@ const TabPane = Tabs.TabPane;
 
     onPageChange(page, pageSize) {
 
-        console.log('page=' + page);
         if (page >= this.pageCount) {
             this.elastic.search(this.queryStore.buildPagination(5 * (page - 1) + 1).toJSON(), false).then(result => {
                 this.setState({
