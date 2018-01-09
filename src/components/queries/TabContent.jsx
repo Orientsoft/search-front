@@ -59,14 +59,14 @@ const TabPane = Tabs.TabPane;
             return filter.fields.map((field, key) => ({
                 key: key,
                 label: field.label,
-                value: field.field
+                field: field.field
             }));
         }));
 
         var result = [
             { 'field': '@timestamp', 'label': '时间' },
             { 'field': 'index', 'label': '数据源' }
-        ]
+        ];
         selectedFields.map((item) => result.push(item))
         return result
     }
@@ -111,29 +111,19 @@ const TabPane = Tabs.TabPane;
             this.state.result = this.getHits();
         };
         return this.state.result.map((hit, key) => {
-            forEach(hit.highlight, (value, key) => {
-                set(hit._source, key, value.toString());
-            });
             if (this.fields.length > 2) {
                 var fields = this.fields.map((col, key) => {
                     var field = col.field
                     var source = hit._source
-                    if (field == 'index') {
+                    
+                    if (field === 'index') {
                         return {
                             [field]: hit._index
                         }
                     }
-                    else if (source[field]) {
-                        return {
-                            [field]: source[field]
-                        }
-                    } else {
-                        return {
-                            [field]: get(source, field)
-                        }
-
+                    return {
+                        [field]: get(source, field)
                     }
-
                 })
 
                 fields.push({
@@ -145,7 +135,6 @@ const TabPane = Tabs.TabPane;
                 return tableDataObj
             }
             return []
-
         });
     }
 
