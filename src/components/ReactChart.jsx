@@ -5,10 +5,10 @@ import { computed } from 'mobx';
 import get from 'lodash/get';
 import * as moment from 'moment';
 
-const chartConfig = [
-    { name: '手机', fileds: {}, type: 'line', title: '中间件', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
-    { name: '手机', fileds: {}, type: 'histogram', title: 'tploader', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' }
-];
+// const chartConfig = [
+//     { name: '手机', fileds: {}, type: 'line', title: '中间件', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
+//     { name: '手机', fileds: {}, type: 'histogram', title: 'tploader', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' }
+// ];
 
 @observer class ReactChart extends BaseComponent {
     constructor(props, context) {
@@ -16,7 +16,7 @@ const chartConfig = [
         this.charts = [];
         this.state = {
             // data: [], 
-            chartConfig: []
+            // chartConfig: []
         }
         this.barChartPlotter = this.barChartPlotter.bind(this);
         this.darkenColor = this.darkenColor.bind(this);
@@ -26,7 +26,7 @@ const chartConfig = [
         const buckets = this.getBuckets('@timestamp');
         const result = this.queryStore.filterFields.map(() => []);
 
-        return buckets.reduce((result, bucket) => {
+        var data = buckets.reduce((result, bucket) => {
             this.queryStore.filterFields.forEach((field, key) => {
                 result[key].push([
                     new Date(bucket.key),
@@ -35,12 +35,24 @@ const chartConfig = [
             });
             return result;
         }, result);
+        return data
     }
 
+    @computed get chartConfig () {
+        var chartConfig = this.appStore.selectedConfig.metrics.map((metric)=>{
+            return {
+                title: metric.chart.title,
+                type: metric.chart.type, 
+                Xtitle: metric.chart.x.label, 
+                Ytitle: metric.chart.y.label
+            }
+        })
+        return chartConfig;
+    }
     render() {
         return (
             <div className="clearfix">
-                {this.state.chartConfig.length > 0 && this.data.length > 0 && this.state.chartConfig.map((item, key) => (
+                {this.chartConfig.length > 0 && this.data.length > 0 && this.chartConfig.map((item, key) => (
                     <div key={key} className="chart">
                         <div key={key} ref={el => this.initChart(el, key, this.data[key], item)}></div>
                     </div>
@@ -50,7 +62,7 @@ const chartConfig = [
     }
 
     componentDidUpdate() {
-        if (this.charts.length > 0 && this.charts.length == this.state.chartConfig.length) {
+        if (this.charts.length > 0 && this.charts.length == this.chartConfig.length && this.chartConfig.length >= 2) {
             const sync = Dygraph.synchronize(this.charts);
         }
     }
@@ -58,12 +70,12 @@ const chartConfig = [
     initChart(el, key, data, chartConfig) {
         let chart = this.charts[key];
         if (!chart) {
-            if (chartConfig.type == 'histogram') {
+            if (chartConfig.type == 'bar') {
                 chart = new Dygraph(el, data, {
-                    labels: ['x', '数量'],
+                    labels: ['x', chartConfig.Ytitle],
                     drawGrid: false,
                     title: chartConfig.title,
-                    height: 200,
+                    height: 300,
                     colors: ['#CC3333'],
                     fillGraph: true,
                     legend: 'follow',
@@ -71,7 +83,7 @@ const chartConfig = [
                     highlightCircleSize: 6,
                     axisLineWidth: 1,
                     ylabel: chartConfig.Ytitle,
-                    xlabel: chartConfig.Xtitle,
+                    // xlabel: chartConfig.Xtitle,
                     strokeWidth: 2,
                     plotter: this.barChartPlotter,
                     plugins: [
@@ -82,17 +94,18 @@ const chartConfig = [
                 })
             } else if (chartConfig.type == 'line') {
                 chart = new Dygraph(el, data, {
-                    labels: ['x', '数量'],
+                    labels: ['x', chartConfig.Ytitle],
                     drawGrid: false,
                     title: chartConfig.title,
-                    height: 200,
+                    height: 300,
+                    xLabelHeight: 22, 
                     colors: ['#CC3333'],
                     fillGraph: true,
                     // xRangePad: 50,
                     highlightCircleSize: 6,
                     axisLineWidth: 1,
                     ylabel: chartConfig.Ytitle,
-                    xlabel: chartConfig.Xtitle,
+                    // xlabel: chartConfig.Xtitle,
                     legend: 'follow',
                     // drawAxesAtZero: true, 
                     // includeZero: true, 
@@ -107,6 +120,8 @@ const chartConfig = [
                 })
             }
             this.charts[key] = chart
+        }else {
+            chart.updateOptions({'file':data})
         }
     }
 
@@ -152,12 +167,7 @@ const chartConfig = [
     }
 
     componentDidMount() {
-        if (this.data) {
-            this.setState({
-                // data: this.data, 
-                chartConfig: chartConfig
-            })
-        }
+        
     }
 }
 
