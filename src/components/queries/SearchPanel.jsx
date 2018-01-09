@@ -100,7 +100,7 @@ const formItemLayout = {
         }
     }
 
-    onFieldChange(field) {
+    onFieldChange(fields) {
         
     }
 
@@ -177,7 +177,11 @@ const formItemLayout = {
                             format="YYYY-MM-DD HH:mm:ss" />
                     </FormItem>
                     <FormItem {...formItemLayout} label="过滤字段">
-                        <CheckboxGroup options={this.filterFields} Change={value => this.onFieldChange(value)} />
+                        <CheckboxGroup onChange={value => this.onFieldChange(value)}>
+                        {this.filterFields.map((field, key) => (
+                            <Checkbox key={key} style={{ lineHeight: '2.8em' }} value={field.value}>{field.label}</Checkbox>
+                        ))}
+                        </CheckboxGroup>
                     </FormItem>
                     <FormItem {...formItemLayout} label="条件筛选">
                         <Col span={20}>
