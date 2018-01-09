@@ -9,3 +9,5 @@ import { defineQuery } from './Query';
  */
 export const term = defineQuery('term');
 export const terms = defineQuery('terms');
+export const range = defineQuery('range');
+export const regexp = defineQuery('regexp');
