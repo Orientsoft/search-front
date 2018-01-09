@@ -56,11 +56,13 @@ const TabPane = Tabs.TabPane;
 
     @computed get fields() {
         var selectedFields = flattenDeep(this.appStore.selectedConfig.sources.map((filter) => {
-            return filter.fields.map((field, key) => ({
-                key: key,
-                label: field.label,
-                value: field.field
-            }));
+            if (filter.fields.map){
+                return filter.fields.map((field, key) => ({
+                    key: key,
+                    label: field.label,
+                    field: field.field
+                }));
+            }
         }));
 
         var result = [
@@ -111,9 +113,7 @@ const TabPane = Tabs.TabPane;
             this.state.result = this.getHits();
         };
         return this.state.result.map((hit, key) => {
-            forEach(hit.highlight, (value, key) => {
-                set(hit._source, key, value.toString());
-            });
+            
             if (this.fields.length > 2) {
                 var fields = this.fields.map((col, key) => {
                     var field = col.field
@@ -123,17 +123,9 @@ const TabPane = Tabs.TabPane;
                             [field]: hit._index
                         }
                     }
-                    else if (source[field]) {
-                        return {
-                            [field]: source[field]
-                        }
-                    } else {
                         return {
                             [field]: get(source, field)
                         }
-
-                    }
-
                 })
 
                 fields.push({

@@ -4,13 +4,6 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import * as moment from 'moment';
 
-// 数据结构
-// const data = [
-//     { title: 'DB', data: [[1, 64], [2, 54], [3, 12], [4, 33], [5, 93], [6, 34], [7, 14], [8, 43], [9, 94], [10, 63], [11, 88]] },
-//     { title: 'tploader', data: [[1, 14], [2, 43], [3, 94], [4, 63], [5, 88], [6, 19], [7, 83], [8, 34], [9, 77], [10, 20], [11, 67]] },
-//     { title: '中间件', data: [[1, 84], [2, 96], [3, 75], [4, 23], [5, 64], [6, 6], [7, 73], [8, 64], [9, 54], [10, 12], [11, 33]] },
-//     { title: '数据库', data: [[1, 34], [2, 77], [3, 20], [4, 67], [5, 12], [6, 4], [7, 63], [8, 88], [9, 19], [10, 83], [11, 34]] }
-// ]
 
 const chartConfig = [
     { name: '手机', fileds: {}, type: 'line', title: '中间件', Yaxis: '', Xaxis: '', Ytitle: '数量(万笔)', Xtitle: '时间' },
@@ -28,21 +21,6 @@ const chartConfig = [
         this.darkenColor = this.darkenColor.bind(this);
     }
 
-    // @computed get data() {
-    //     // const aggs = this.getBuckets(this.queryStore.filterFields[0].field);
-    //     var data = [];
-    //     data = this.queryStore.filterFields.map((filterField) => {
-    //         return this.getBuckets(filterField.field).map(agg => this.getBuckets('@timestamp', {
-    //             aggregations: agg
-    //         })).reduce((result, buckets) => result.concat(buckets.map(bucket => [
-    //             new Date(bucket.key),
-    //             bucket.doc_count
-    //         ])), []);
-    //     })
-
-    //     return data;
-
-    // }
 
     @computed get data() {
         const aggs = this.getBuckets(this.queryStore.filterFields[0].field);
@@ -54,29 +32,12 @@ const chartConfig = [
             bucket.doc_count
         ])), []);
     }
-    // @computed get data() {
-
-    //     return this.queryStore.filterFields.map((filterField) => {
-    //         return this.getBuckets(filterField.field).map(agg => this.getBuckets('@timestamp', {
-    //             aggregations: agg
-    //         })).reduce((result, buckets) => result.concat(buckets.map(bucket => [
-    //             new Date(bucket.key),
-    //             bucket.doc_count
-    //         ])), []);
-    //     })
-    // }
-
+    
 
     render() {
         return (
             <div className="clearfix">
-                {
-                    // this.state.chartConfig.length > 0 && this.data[0].length > 0 && this.state.chartConfig.map((item, key) => (
-                    //     <div key={key} className="chart">
-                    //         <div key={key} ref={el => this.initChart(el, key, this.data[key], item)}></div>
-                    //     </div>
-                    // ))
-                }
+               
                 {
                     this.state.chartConfig.length > 0 && this.data.length > 0 && this.state.chartConfig.map((item, key) => (
                         <div key={key} className="chart">
